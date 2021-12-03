@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">ChatApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome_to_ChatApp">Welcome to ChatApp</string>
+    <string name="send">Send</string>
+    <string name="read_our_pr">Read our Privacy Policy. Tap "Agree &amp; Continue" to accept the Terms of Service.
+</string>
+    <string name="frome_faraz">from\nFARAZ</string>
+    <string name="enter_sms_c">Enter SMS code</string>
+    <string name="countrycode">+91</string>
+    <string name="Done">Done</string>
+
 </resources>
