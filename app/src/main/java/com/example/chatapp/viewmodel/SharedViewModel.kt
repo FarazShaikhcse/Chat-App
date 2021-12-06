@@ -16,6 +16,9 @@ class SharedViewModel : ViewModel() {
     private val _gotoHomePageStatus = MutableLiveData<Boolean>()
     val gotoHomePageStatus = _gotoHomePageStatus as LiveData<Boolean>
 
+    private val _gotoUserDetailsPageStatus = MutableLiveData<Boolean>()
+    val gotoUserDetailsPageStatus = _gotoUserDetailsPageStatus as LiveData<Boolean>
+
     fun setGoToWelcomePageStatus(status: Boolean) {
         _gotoWelcomePageStatus.value = status
     }
@@ -27,5 +30,10 @@ class SharedViewModel : ViewModel() {
     fun setGotoHomePageStatus(status: Boolean) {
         _gotoHomePageStatus.value = status
     }
+
+    fun setGotoUserDetailsPageStatus(status: Boolean) {
+        _gotoUserDetailsPageStatus.value = status
+    }
+
 
 }

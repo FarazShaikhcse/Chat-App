@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
 import com.example.chatapp.viewmodel.SharedViewModel
@@ -21,6 +22,7 @@ class HomeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        (activity as AppCompatActivity).supportActionBar?.show()
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory()
@@ -29,6 +31,7 @@ class HomeFragment : Fragment() {
             FirebaseAuth.getInstance().signOut()
             sharedViewModel.setGoToWelcomePageStatus(true)
         }
+
         return view
     }
 }

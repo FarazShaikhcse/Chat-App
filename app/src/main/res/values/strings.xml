@@ -10,5 +10,8 @@
     <string name="enter_sms_c">Enter SMS code</string>
     <string name="countrycode">+91</string>
     <string name="Done">Done</string>
+    <string name="usernameLabel">Username</string>
+    <string name="about">About</string>
+
 
 </resources>

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
 import com.example.chatapp.util.SharedPref
@@ -29,7 +30,7 @@ class OtpLoginPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
+        (activity as AppCompatActivity).supportActionBar?.hide()
         auth = FirebaseAuth.getInstance()
         val view = inflater.inflate(R.layout.fragment_otp_login_page, container, false)
         sharedViewModel = ViewModelProvider(
@@ -59,8 +60,10 @@ class OtpLoginPageFragment : Fragment() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    task.result?.additionalUserInfo?.isNewUser
-                    sharedViewModel.setGotoHomePageStatus(true)
+                    if(task.result?.additionalUserInfo?.isNewUser == true)
+                        sharedViewModel.setGotoUserDetailsPageStatus(true)
+                    else
+                        sharedViewModel.setGotoHomePageStatus(true)
                 } else {
                     // Sign in failed, display a message and update the UI
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
 import com.example.chatapp.util.SharedPref
@@ -40,6 +41,7 @@ class WelcomePageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_welcome_page, container, false)
+        (activity as AppCompatActivity).supportActionBar?.hide()
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory()
