@@ -6,6 +6,7 @@
         <entry key="app/src/main/res/drawable/circle.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/sendbuttonbg.xml" value="0.13518518518518519" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.14719202898550723" />
+        <entry key="app/src/main/res/layout/chats_layout.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_group_chat.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/layout/fragment_otp_login_page.xml" value="0.25" />

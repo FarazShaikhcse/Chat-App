@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.example.chatapp.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class GroupChatFragment : Fragment() {
@@ -18,6 +20,8 @@ class GroupChatFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_group_chat, container, false)
         (activity as AppCompatActivity).supportActionBar?.show()
+        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
+        navBar.isVisible = true
         return view
     }
 

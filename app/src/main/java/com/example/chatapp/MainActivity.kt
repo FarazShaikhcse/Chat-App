@@ -14,6 +14,7 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import android.view.Menu
+import android.view.MenuItem
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         val fm = supportFragmentManager
         var active: Fragment = homeFragment
         fm.beginTransaction().add(R.id.flFragment, groupChatFragment, "2").hide(groupChatFragment).commit();
-        fm.beginTransaction().add(R.id.flFragment, homeFragment, "1").commit();
+//        fm.beginTransaction().add(R.id.flFragment, homeFragment, "1").commit();
 
         binding.navMenu.setOnNavigationItemSelectedListener {
             when(it.itemId){
@@ -99,5 +100,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.logoutmenu, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.logout -> {
+                FirebaseAuth.getInstance().signOut()
+                sharedViewModel.setGoToWelcomePageStatus(true)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -9,11 +9,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
 import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
@@ -31,6 +33,8 @@ class OtpLoginPageFragment : Fragment() {
     ): View? {
 
         (activity as AppCompatActivity).supportActionBar?.hide()
+        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
+        navBar.isVisible = false
         auth = FirebaseAuth.getInstance()
         val view = inflater.inflate(R.layout.fragment_otp_login_page, container, false)
         sharedViewModel = ViewModelProvider(

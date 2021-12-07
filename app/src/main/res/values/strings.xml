@@ -12,6 +12,7 @@
     <string name="Done">Done</string>
     <string name="usernameLabel">Username</string>
     <string name="about">About</string>
+    <string name="username">USERNAME</string>
 
 
 </resources>

@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
 import com.example.chatapp.util.SharedPref
@@ -21,6 +22,11 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
+
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
+
+
 
 
 class WelcomePageFragment : Fragment() {
@@ -42,6 +48,8 @@ class WelcomePageFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_welcome_page, container, false)
         (activity as AppCompatActivity).supportActionBar?.hide()
+        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
+        navBar.isVisible = false
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory()
