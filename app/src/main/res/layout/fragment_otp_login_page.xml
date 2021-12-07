@@ -53,12 +53,14 @@
     <EditText
         android:id="@+id/otp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
+        android:background="@color/dark"
         android:inputType="number"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_sms_c" />
@@ -68,14 +70,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/sendbuttonbg"
         android:backgroundTint="#1EBE71"
         android:backgroundTintMode="add"
         android:text="@string/Done"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/otp" />
+        app:layout_constraintTop_toBottomOf="@+id/otp"
+        app:layout_constraintVertical_bias="0.189" />
 </androidx.constraintlayout.widget.ConstraintLayout>

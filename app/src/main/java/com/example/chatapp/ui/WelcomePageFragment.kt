@@ -48,8 +48,6 @@ class WelcomePageFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_welcome_page, container, false)
         (activity as AppCompatActivity).supportActionBar?.hide()
-        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
-        navBar.isVisible = false
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory()

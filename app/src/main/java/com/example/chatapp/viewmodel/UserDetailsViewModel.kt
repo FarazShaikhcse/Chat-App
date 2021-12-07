@@ -14,14 +14,33 @@ class UserDetailsViewModel: ViewModel() {
     private val _userDetailAddedStatus = MutableLiveData<Boolean>()
     val userDetailAddedStatus = _userDetailAddedStatus as LiveData<Boolean>
 
+    private val _userDetailFetchedStatus = MutableLiveData<User>()
+    val userDetailFetchedStatus = _userDetailFetchedStatus as LiveData<User>
+
+    private val _userPFPfetchedStatus = MutableLiveData<Uri?>()
+    val userPFPfetchedStatus = _userPFPfetchedStatus as LiveData<Uri?>
+
     fun addUserDetails(user: User) {
         viewModelScope.launch {
             _userDetailAddedStatus.value = FirebaseDatabaseService.writeUserDataToDatabase(user)
         }
     }
+
+    fun readUserDetails() {
+        viewModelScope.launch {
+            _userDetailFetchedStatus.value = FirebaseDatabaseService.readUserDataToDatabase()
+        }
+    }
+
     fun uploadProfilePic(uri: Uri) {
         viewModelScope.launch {
             FirebaseStorageService.uploadprofile(uri)
+        }
+    }
+
+    fun getProfilePic() {
+        viewModelScope.launch {
+            _userPFPfetchedStatus.value = FirebaseStorageService.fetchProfile()
         }
     }
 }

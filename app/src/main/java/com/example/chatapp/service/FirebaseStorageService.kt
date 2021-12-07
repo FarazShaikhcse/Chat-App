@@ -25,4 +25,19 @@ object FirebaseStorageService {
             }
         }
     }
+    suspend fun fetchProfile(): Uri? {
+        return suspendCoroutine { cont ->
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                val storageRef = FirebaseStorage.getInstance().reference
+                val filerRef = storageRef.child("users_PFP/" + uid + ".jpg")
+                filerRef.downloadUrl.addOnSuccessListener {
+                    cont.resumeWith(Result.success(it))
+                }
+                    .addOnFailureListener {
+                        cont.resumeWith(Result.success(null))
+                    }
+            }
+        }
+    }
 }

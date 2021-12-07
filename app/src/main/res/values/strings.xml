@@ -13,6 +13,11 @@
     <string name="usernameLabel">Username</string>
     <string name="about">About</string>
     <string name="username">USERNAME</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
+    <string name="chat">CHATS</string>
+    <string name="group_chat">GROUPS</string>
+    <string name="save">Save</string>
 
 
 </resources>

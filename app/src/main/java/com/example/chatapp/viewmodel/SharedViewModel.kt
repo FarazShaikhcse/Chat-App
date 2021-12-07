@@ -23,8 +23,14 @@ class SharedViewModel : ViewModel() {
     private val _gotoUserDetailsPageStatus = MutableLiveData<Boolean>()
     val gotoUserDetailsPageStatus = _gotoUserDetailsPageStatus as LiveData<Boolean>
 
+    private val _gotoEditProfilePageStatus = MutableLiveData<Boolean>()
+    val gotoEditProfilePageStatus = _gotoEditProfilePageStatus as LiveData<Boolean>
+
     private val _userchatsFromDb = MutableLiveData<MutableList<Chat>>()
     val userchatsFromDb = _userchatsFromDb as LiveData<MutableList<Chat>>
+
+    private val _gotoChatDetailsPageStatus = MutableLiveData<Boolean>()
+    val gotoChatDetailsPageStatus = _gotoChatDetailsPageStatus as LiveData<Boolean>
 
     fun setGoToWelcomePageStatus(status: Boolean) {
         _gotoWelcomePageStatus.value = status
@@ -42,10 +48,18 @@ class SharedViewModel : ViewModel() {
         _gotoUserDetailsPageStatus.value = status
     }
 
+    fun setGotoEditProfilePageStatus(status: Boolean) {
+        _gotoEditProfilePageStatus.value = status
+    }
+
     fun getChatsFromDB() {
         viewModelScope.launch {
             _userchatsFromDb.value = FirebaseDatabaseService.getChatsFromDB(1)
         }
+    }
+
+    fun setGoToChatDetailsPageStatus(status: Boolean) {
+        _gotoChatDetailsPageStatus.value = status
     }
 
 }

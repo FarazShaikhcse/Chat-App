@@ -33,8 +33,6 @@ class OtpLoginPageFragment : Fragment() {
     ): View? {
 
         (activity as AppCompatActivity).supportActionBar?.hide()
-        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
-        navBar.isVisible = false
         auth = FirebaseAuth.getInstance()
         val view = inflater.inflate(R.layout.fragment_otp_login_page, container, false)
         sharedViewModel = ViewModelProvider(

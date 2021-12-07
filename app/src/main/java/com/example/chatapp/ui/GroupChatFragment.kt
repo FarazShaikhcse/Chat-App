@@ -20,8 +20,6 @@ class GroupChatFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_group_chat, container, false)
         (activity as AppCompatActivity).supportActionBar?.show()
-        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.navMenu)
-        navBar.isVisible = true
         return view
     }
 

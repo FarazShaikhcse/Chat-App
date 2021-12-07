@@ -7,24 +7,39 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.service.AuthenticationService
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ChatAdapter(
     var chats: MutableList<Chat>
 ) : RecyclerView.Adapter<ChatAdapter.ChatsViewHolder>() {
 
-    inner class ChatsViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview)
+    inner class ChatsViewHolder(itemview: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemview) {
+        init {
+            itemview.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
+    }
 
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    private lateinit var mListner: OnItemClickListener
     var chatList: ArrayList<Chat> = ArrayList()
 
     init {
         chatList = chats as ArrayList<Chat>
+
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        mListner = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatsViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.chats_layout, parent, false)
-        return ChatsViewHolder(view)
+        return ChatsViewHolder(view, mListner)
     }
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {

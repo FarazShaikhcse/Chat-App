@@ -28,6 +28,22 @@ object FirebaseDatabaseService {
             }
         }
     }
+    suspend fun readUserDataToDatabase(): User {
+        return suspendCoroutine { cont ->
+            val db = FirebaseFirestore.getInstance()
+            AuthenticationService.getUserID()?.let {
+                db.collection(Constants.USERS).document(it)
+                    .get().addOnSuccessListener {
+                        val user = User(it.getString(Constants.USERNAME)!!,
+                            it.getString(Constants.ABOUT)!!, it.getString(Constants.USERID)!!)
+                        cont.resumeWith(Result.success(user))
+                    }
+                    .addOnFailureListener {
+                        cont.resumeWith(Result.failure(it))
+                    }
+            }
+        }
+    }
 
     suspend fun getChatsFromDB(limit: Int): MutableList<Chat> {
         return suspendCoroutine { cont ->
@@ -52,36 +68,37 @@ object FirebaseDatabaseService {
                         Log.d("chatsfromdb", it.toString())
                     }
             }
-
         }
     }
 
-    suspend fun getMessages(limit: Int, doc: QueryDocumentSnapshot) = suspendCoroutine<Chat>{ cont ->
+    suspend fun getMessages(limit: Int, doc: QueryDocumentSnapshot) =
+        suspendCoroutine<Chat> { cont ->
 
-        doc.reference.collection(Constants.MESSAGES)
-            .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
-            .limit(limit.toLong()).get()
-            .addOnSuccessListener {
-                val msgList = arrayListOf<Message>()
-                for (msg in it.documents) {
-                    msgList.add(Message(
-                        msg.getString(Constants.MESSAGEID)!!,
-                        msg.getString(Constants.SENDERID)!!,
-                        msg.get(Constants.SENT_TIME)!! as Long,
-                        msg.getString(Constants.TEXT)!!,
-                        msg.getString(Constants.MESSAGE_TYPE)!!
-                    ))
+            doc.reference.collection(Constants.MESSAGES)
+                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
+                .limit(limit.toLong()).get()
+                .addOnSuccessListener {
+                    val msgList = arrayListOf<Message>()
+                    for (msg in it.documents) {
+                        msgList.add(
+                            Message(
+                                msg.getString(Constants.MESSAGEID)!!,
+                                msg.getString(Constants.SENDERID)!!,
+                                msg.get(Constants.SENT_TIME)!! as Long,
+                                msg.getString(Constants.TEXT)!!,
+                                msg.getString(Constants.MESSAGE_TYPE)!!
+                            )
+                        )
+                    }
+                    val chat = Chat(
+                        doc.get(Constants.PARTICIPANTS) as ArrayList<String>,
+                        msgList
+                    )
+                    cont.resumeWith(Result.success(chat))
+                    Log.d("chatsfromdb", chat.toString())
                 }
-                val chat = Chat(
-                    doc.get(Constants.PARTICIPANTS) as ArrayList<String>,
-                    msgList
-                )
-                cont.resumeWith(Result.success(chat))
-                Log.d("chatsfromdb", chat.toString())
-            }
-            .addOnFailureListener {
-                cont.resumeWith(Result.failure(it))
-            }
-    }
-
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                }
+        }
 }
