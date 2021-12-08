@@ -17,4 +17,5 @@ object Constants {
     const val ABOUT = "about"
     const val USERID = "userId"
     const val CHAT_POSITION = "chatPosition"
+    const val FUID = "fuid"
 }

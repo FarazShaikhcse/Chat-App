@@ -12,6 +12,8 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import android.view.Menu
 import android.view.MenuItem
+import com.example.chatapp.service.AuthenticationService
+import com.example.chatapp.util.Constants
 
 
 class MainActivity : AppCompatActivity() {
@@ -77,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun navigatePage(fragment: Fragment) {
+    fun navigatePage(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment, fragment)
             commit()
@@ -86,10 +88,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (FirebaseAuth.getInstance().currentUser != null)
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            AuthenticationService.getUserID()?.let { SharedPref.addString(Constants.FUID, it) }
             sharedViewModel.setGotoHomePageStatus(true)
-        else
+        }
+        else {
             sharedViewModel.setGoToWelcomePageStatus(true)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

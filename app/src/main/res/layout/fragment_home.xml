@@ -17,6 +17,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tabIconTint="@color/teal_200"
+        app:tabIndicatorColor="@color/teal_200"
+        app:tabSelectedTextColor="@color/white"
         app:tabTextColor="#9DA5AC">
 
         <com.google.android.material.tabs.TabItem
@@ -32,9 +35,9 @@
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/viewpager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />

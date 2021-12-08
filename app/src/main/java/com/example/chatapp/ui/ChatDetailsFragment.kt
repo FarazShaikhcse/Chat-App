@@ -7,10 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.chatapp.MainActivity
 import com.example.chatapp.R
 import com.example.chatapp.databinding.FragmentChatDetailsBinding
 import com.example.chatapp.databinding.FragmentSingleChatBinding
 import com.example.chatapp.databinding.FragmentUserDetailsBinding
+import com.example.chatapp.util.Constants
+import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
 
@@ -30,8 +33,15 @@ class ChatDetailsFragment : Fragment() {
         binding = FragmentChatDetailsBinding.inflate(layoutInflater)
         val view = binding.root
         binding.backButton.setOnClickListener {
-            sharedViewModel.setGotoHomePageStatus(true)
+            SharedPref.addString(Constants.USERID, "")
+            requireActivity().supportFragmentManager.beginTransaction().apply {
+                replace(R.id.flFragment, HomeFragment())
+                commit()
+            }
         }
+
+        binding.usernameTV.text = SharedPref.get(Constants.USERID)
+
         return view
     }
 }

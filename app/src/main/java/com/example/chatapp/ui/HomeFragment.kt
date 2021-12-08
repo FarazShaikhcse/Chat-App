@@ -35,7 +35,7 @@ class HomeFragment : Fragment() {
         tablayout = view.findViewById(R.id.tabLayout)
         viewPager = view.findViewById(R.id.viewpager)
         tablayout.setupWithViewPager(viewPager)
-        val vpadapter = ViewPagerAdapter(requireActivity().supportFragmentManager,
+        val vpadapter = ViewPagerAdapter(childFragmentManager,
             FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT)
         vpadapter.addFragment(SingleChatFragment(), getString(R.string.chat))
         vpadapter.addFragment(GroupChatFragment(), getString(R.string.group_chat))
