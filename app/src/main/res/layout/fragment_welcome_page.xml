@@ -132,7 +132,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:ems="10"
+            android:letterSpacing="0.25"
             android:inputType="phone"
+            android:gravity="center"
+            android:maxLength="10"
             app:layout_constraintStart_toEndOf="@+id/countrycode"
             android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent" />

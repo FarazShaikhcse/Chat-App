@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="dark">#232D36</color>
     <color name="msghintcolor">#707980</color>
+    <color name="sent_msg_color">#007f6e</color>
 </resources>

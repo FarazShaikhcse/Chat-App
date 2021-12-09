@@ -14,11 +14,14 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.util.Constants
+import com.example.chatapp.viewmodel.UserDetailsViewModel
+import com.example.chatapp.viewmodel.UserDetailsViewModelFactory
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var binding: ActivityMainBinding
+    private lateinit var userDetailsViewModel: UserDetailsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,20 +29,20 @@ class MainActivity : AppCompatActivity() {
             this,
             SharedViewModelFactory()
         )[SharedViewModel::class.java]
+        userDetailsViewModel = ViewModelProvider(
+            this,
+            UserDetailsViewModelFactory()
+        )[UserDetailsViewModel::class.java]
         observeNavigation()
         SharedPref.initSharedPref(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
-//        val homeFragment = HomeFragment()
-//        val groupChatFragment = GroupChatFragment()
-//        val fm = supportFragmentManager
-//        var active: Fragment = homeFragment
-//        fm.beginTransaction().add(R.id.flFragment, groupChatFragment, "2").hide(groupChatFragment)
-//            .commit();
-////        fm.beginTransaction().add(R.id.flFragment, homeFragment, "1").commit();
-
+        userDetailsViewModel.readUserDetails()
     }
 
     private fun observeNavigation() {
+        userDetailsViewModel.userDetailFetchedStatus.observe(this@MainActivity) {
+            SharedPref.addString(Constants.USERNAME, it.userName)
+        }
         sharedViewModel.gotoHomePageStatus.observe(this@MainActivity, {
             if (it) {
                 navigatePage(HomeFragment())

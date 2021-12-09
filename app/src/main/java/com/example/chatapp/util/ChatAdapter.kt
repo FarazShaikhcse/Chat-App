@@ -7,10 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.service.AuthenticationService
+import com.example.chatapp.wrapper.User
 import kotlin.collections.ArrayList
 
 class ChatAdapter(
-    var chats: MutableList<Chat>
+    var users: MutableList<User>
 ) : RecyclerView.Adapter<ChatAdapter.ChatsViewHolder>() {
 
     inner class ChatsViewHolder(itemview: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemview) {
@@ -26,10 +27,10 @@ class ChatAdapter(
     }
 
     private lateinit var mListner: OnItemClickListener
-    var chatList: ArrayList<Chat> = ArrayList()
+    var userList: ArrayList<User> = ArrayList()
 
     init {
-        chatList = chats as ArrayList<Chat>
+        userList = users as ArrayList<User>
 
     }
 
@@ -46,16 +47,13 @@ class ChatAdapter(
         val username = holder.itemView.findViewById<TextView>(R.id.chatUsernameTV)
         val message = holder.itemView.findViewById<TextView>(R.id.messageTV)
         holder.itemView.apply {
-            if(chatList[position].participants[0] != AuthenticationService.getUserID())
-                username.text = chatList[position].participants[0]
-            else
-                username.text = chatList[position].participants[1]
-            message.text = chatList[position].message[0].text
+            username.text = userList[position].userName
+//            message.text = userList[position].message[0].text
         }
     }
 
     override fun getItemCount(): Int {
-        return chats.size
+        return users.size
     }
 
 

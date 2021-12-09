@@ -1,13 +1,8 @@
 package com.example.chatapp.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.chatapp.service.FirebaseDatabaseService
-import com.example.chatapp.util.Chat
-import kotlinx.coroutines.launch
 
 class SharedViewModel : ViewModel() {
 
@@ -25,9 +20,6 @@ class SharedViewModel : ViewModel() {
 
     private val _gotoEditProfilePageStatus = MutableLiveData<Boolean>()
     val gotoEditProfilePageStatus = _gotoEditProfilePageStatus as LiveData<Boolean>
-
-    private val _userchatsFromDb = MutableLiveData<MutableList<Chat>>()
-    val userchatsFromDb = _userchatsFromDb as LiveData<MutableList<Chat>>
 
     private val _gotoChatDetailsPageStatus = MutableLiveData<Boolean>()
     val gotoChatDetailsPageStatus = _gotoChatDetailsPageStatus as LiveData<Boolean>
@@ -50,12 +42,6 @@ class SharedViewModel : ViewModel() {
 
     fun setGotoEditProfilePageStatus(status: Boolean) {
         _gotoEditProfilePageStatus.value = status
-    }
-
-    fun getChatsFromDB() {
-        viewModelScope.launch {
-            _userchatsFromDb.value = FirebaseDatabaseService.getChatsFromDB(1)
-        }
     }
 
     fun setGoToChatDetailsPageStatus(status: Boolean) {

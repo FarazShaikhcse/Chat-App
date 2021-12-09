@@ -6,16 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.example.chatapp.R
-import com.example.chatapp.util.Chat
+import com.example.chatapp.wrapper.Chat
 import com.example.chatapp.util.ChatAdapter
 import com.example.chatapp.util.ViewPagerAdapter
 import com.example.chatapp.viewmodel.SharedViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
 

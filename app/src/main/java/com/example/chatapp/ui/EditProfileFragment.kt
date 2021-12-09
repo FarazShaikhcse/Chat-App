@@ -58,12 +58,7 @@ class EditProfileFragment : Fragment() {
                     .load(it)
                     .into(binding.profileImage)
             }
-            else
-            {
-                Glide.with(requireContext())
-                    .load(resources.getDrawable(R.id.profileImage))
-                    .into(binding.profileImage)
-            }
+
         }
         userDetailsViewModel.userDetailFetchedStatus.observe(viewLifecycleOwner) {
             binding.username.editText?.setText(it.userName)
