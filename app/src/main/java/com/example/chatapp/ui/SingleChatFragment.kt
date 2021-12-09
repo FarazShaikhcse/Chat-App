@@ -42,7 +42,7 @@ class SingleChatFragment : Fragment() {
             requireActivity(),
             SingleChatViewModelFactory()
         )[SingleChatViewModel::class.java]
-        adapter = ChatAdapter(userList)
+        adapter = ChatAdapter(userList, requireContext())
         recyclerView = view.findViewById(R.id.chatRV)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
@@ -82,11 +82,7 @@ class SingleChatFragment : Fragment() {
     }
 
     private fun saveClickedChatDetails(position: Int) {
-//        if ( userList[position].participants[0] == SharedPref.get(Constants.FUID)) {
-//            SharedPref.addString(Constants.USERID, userList[position].userId)
-//        } else {
             SharedPref.addString(Constants.USERID, userList[position].userId)
-//        }
     }
 
     interface ChatFragmentHostListener {

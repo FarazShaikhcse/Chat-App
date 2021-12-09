@@ -9,6 +9,7 @@ import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.service.FirebaseStorageService
 import com.example.chatapp.wrapper.User
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class UserDetailsViewModel: ViewModel() {
     private val _userDetailAddedStatus = MutableLiveData<Boolean>()
@@ -41,6 +42,17 @@ class UserDetailsViewModel: ViewModel() {
     fun getProfilePic() {
         viewModelScope.launch {
             _userPFPfetchedStatus.value = FirebaseStorageService.fetchProfile()
+        }
+    }
+
+    fun updatePfpUri(it: Uri) {
+        viewModelScope.launch {
+            try {
+                FirebaseDatabaseService.addUriToProfile(it)
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+            }
         }
     }
 }

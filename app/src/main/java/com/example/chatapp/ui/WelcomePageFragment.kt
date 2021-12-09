@@ -25,10 +25,6 @@ import java.util.concurrent.TimeUnit
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-
-
-
-
 class WelcomePageFragment : Fragment() {
     // this stores the phone number of the user
     var number: String = ""
@@ -102,7 +98,6 @@ class WelcomePageFragment : Fragment() {
             Toast.makeText(requireContext(), "Enter mobile number", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     // this method sends the verification code
     // and starts the callback of verification

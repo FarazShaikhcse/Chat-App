@@ -1,23 +1,19 @@
 package com.example.chatapp.ui
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.example.chatapp.R
 import com.example.chatapp.databinding.FragmentEditProfileBinding
-import com.example.chatapp.databinding.FragmentUserDetailsBinding
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
@@ -57,6 +53,7 @@ class EditProfileFragment : Fragment() {
                 Glide.with(requireContext())
                     .load(it)
                     .into(binding.profileImage)
+                userDetailsViewModel.updatePfpUri(it)
             }
 
         }

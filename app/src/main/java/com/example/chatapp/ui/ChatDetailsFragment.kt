@@ -1,5 +1,6 @@
 package com.example.chatapp.ui
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.chatapp.wrapper.Chat
 
 
@@ -50,6 +52,12 @@ class ChatDetailsFragment : Fragment() {
         val selectedChat: User = bundle.getSerializable("clicked_chat") as User
         chatDetailViewModel.updateMessages(selectedChat.userId)
         binding.usernameTV.text = selectedChat.userName
+        context?.let {
+            Glide.with(it)
+                .load(Uri.parse(selectedChat.pfpUri))
+                .into(binding.profileImage)
+        }
+        chatDetailViewModel.updateMessages(selectedChat.userId)
         observeData()
         clickListeners()
         return view
@@ -61,9 +69,9 @@ class ChatDetailsFragment : Fragment() {
             val messageList = it
             val adapter = CustomAdapter(requireContext(), messageList as ArrayList<Message>)
             val linearLayout = LinearLayoutManager(requireContext())
-            linearLayout.reverseLayout = true
             recyclerView.layoutManager = linearLayout
             recyclerView.adapter = adapter
+            recyclerView.smoothScrollToPosition(adapter.itemCount - 1)
         }
         chatDetailViewModel.messageSentStatus.observe(viewLifecycleOwner) {
             binding.msgeditText.setText("")
@@ -82,7 +90,6 @@ class ChatDetailsFragment : Fragment() {
             val text = binding.msgeditText.text.toString()
             val selectedChat: User = bundle.getSerializable("clicked_chat") as User
             chatDetailViewModel.sendMsgToUser(text, selectedChat.userId)
-            chatDetailViewModel.updateMessages(selectedChat.userId)
         }
     }
 }

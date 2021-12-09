@@ -24,7 +24,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 
 class OtpLoginPageFragment : Fragment() {
 
-
     lateinit var auth: FirebaseAuth
     private lateinit var sharedViewModel: SharedViewModel
     override fun onCreateView(

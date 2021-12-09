@@ -8,6 +8,7 @@ import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.wrapper.Chat
 import com.example.chatapp.wrapper.User
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SingleChatViewModel: ViewModel() {
@@ -26,7 +27,9 @@ class SingleChatViewModel: ViewModel() {
 
     fun getAllUsers() {
         viewModelScope.launch {
-            _readUsersFromDb.value = FirebaseDatabaseService.getAllUsersFromDb()
+             FirebaseDatabaseService.getAllUsersFromDbFlow().collect {
+                 _readUsersFromDb.value = it
+            }
         }
     }
 

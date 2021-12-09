@@ -19,6 +19,7 @@
     <string name="group_chat">GROUPS</string>
     <string name="save">Save</string>
     <string name="TypeaMessage">Type a message</string>
+    <string name="create_group">Create Group</string>
 
 
 </resources>

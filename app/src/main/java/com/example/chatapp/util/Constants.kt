@@ -1,13 +1,11 @@
 package com.example.chatapp.util
 
 object Constants {
+    const val GROUPS = "groups"
+    const val PARTICIPANTS = "participants"
     const val USERS = "users"
     const val CHATS = "chats"
     const val SENDERID = "senderId"
-    const val RECEIVERID = "receiverId"
-    const val MESSAGE = "message"
-    const val TIME = "timeCreated"
-    const val PARTICIPANTS = "participants"
     const val MESSAGES = "messages"
     const val SENT_TIME = "sentTime"
     const val MESSAGEID = "messageId"
@@ -16,6 +14,6 @@ object Constants {
     const val USERNAME = "userName"
     const val ABOUT = "about"
     const val USERID = "userId"
-    const val CHAT_POSITION = "chatPosition"
     const val FUID = "fuid"
+    const val PFP_URI = "pfpUri"
 }
