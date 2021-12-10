@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.example.chatapp.R
 import com.example.chatapp.wrapper.Chat
-import com.example.chatapp.util.ChatAdapter
-import com.example.chatapp.util.ViewPagerAdapter
+import com.example.chatapp.adapter.ChatAdapter
+import com.example.chatapp.adapter.ViewPagerAdapter
 import com.example.chatapp.viewmodel.SharedViewModel
 
 class HomeFragment : Fragment() {

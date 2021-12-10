@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.util.Constants
-import com.example.chatapp.util.UserListAdapter
+import com.example.chatapp.adapter.UserListAdapter
 import com.example.chatapp.viewmodel.CreateGroupViewModel
 import com.example.chatapp.viewmodel.CreateGroupViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -1,4 +1,4 @@
-package com.example.chatapp.util
+package com.example.chatapp.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

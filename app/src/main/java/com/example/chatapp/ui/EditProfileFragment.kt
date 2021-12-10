@@ -21,6 +21,7 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.viewmodel.UserDetailsViewModel
 import com.example.chatapp.viewmodel.UserDetailsViewModelFactory
 import com.example.chatapp.wrapper.User
+import kotlin.streams.asSequence
 
 
 class EditProfileFragment : Fragment() {
@@ -45,8 +46,45 @@ class EditProfileFragment : Fragment() {
         )[UserDetailsViewModel::class.java]
         binding = FragmentEditProfileBinding.inflate(layoutInflater)
         val view = binding.root
+        getImage = registerForActivityResult(
+            ActivityResultContracts.GetContent(),
+            ActivityResultCallback {
+                if (it != null) {
+                    uri = it
+                    binding.profileImage.setImageURI(it)
+                    userDetailsViewModel.uploadProfilePic(it)
+                }
+            }
+        )
+        clickListeners()
         userDetailsViewModel.getProfilePic()
         userDetailsViewModel.readUserDetails()
+        observeData()
+        return view
+    }
+
+    private fun clickListeners() {
+        binding.profileImage.setOnClickListener {
+            getImage.launch("image/*")
+        }
+        binding.saveBtn.setOnClickListener {
+            userDetailsViewModel.addUserDetails(
+                User(
+                    binding.username.editText?.text.toString(),
+                    binding.about.editText?.text.toString(), AuthenticationService.getUserID().toString())
+            )
+        }
+    }
+
+    private fun observeData() {
+
+        userDetailsViewModel.userDetailAddedStatus.observe(viewLifecycleOwner){
+            if(it)
+                sharedViewModel.setGotoHomePageStatus(true)
+            else
+                Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_LONG).show()
+        }
+
         userDetailsViewModel.userPFPfetchedStatus.observe(viewLifecycleOwner) {
             if (it != null) {
                 SharedPref.addString("uri", it.toString())
@@ -61,33 +99,6 @@ class EditProfileFragment : Fragment() {
             binding.username.editText?.setText(it.userName)
             binding.about.editText?.setText(it.about)
         }
-        binding.saveBtn.setOnClickListener {
-            userDetailsViewModel.addUserDetails(
-                User(
-                binding.username.editText?.text.toString(),
-                binding.about.editText?.text.toString(), AuthenticationService.getUserID().toString())
-            )
-        }
-        getImage = registerForActivityResult(
-            ActivityResultContracts.GetContent(),
-            ActivityResultCallback {
-                if (it != null) {
-                    uri = it
-                    binding.profileImage.setImageURI(it)
-                    userDetailsViewModel.uploadProfilePic(it)
-                }
-            }
-        )
-        binding.profileImage.setOnClickListener {
-            getImage.launch("image/*")
-        }
-        userDetailsViewModel.userDetailAddedStatus.observe(viewLifecycleOwner){
-            if(it)
-                sharedViewModel.setGotoHomePageStatus(true)
-            else
-                Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_LONG).show()
-        }
-        return view
     }
 
 }

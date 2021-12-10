@@ -4,5 +4,6 @@ data class Message(
     val senderId: String,
     val sentTime: Long,
     val text: String,
-    val messageType: String
+    val messageType: String,
+    var senderName: String = ""
 ) {}

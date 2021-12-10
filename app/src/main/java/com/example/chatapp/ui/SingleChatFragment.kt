@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
-import com.example.chatapp.util.ChatAdapter
+import com.example.chatapp.adapter.ChatAdapter
 import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
@@ -50,6 +50,7 @@ class SingleChatFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 saveClickedChatDetails(position)
                 val args = Bundle()
+                args.putString(Constants.CHAT_TYPE, Constants.CHATS)
                 args.putSerializable("clicked_chat", userList[position])
                 val newFragment = ChatDetailsFragment()
                 newFragment.arguments = args

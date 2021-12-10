@@ -1,7 +1,8 @@
-package com.example.chatapp.util
+package com.example.chatapp.adapter
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,10 +40,11 @@ class UserListAdapter(
             holder.itemView.findViewById<CircleImageView>(R.id.group_users_pfp)
         val checkBox = holder.itemView.findViewById<CheckBox>(R.id.select_user_cb)
 
-        checkBox.setOnClickListener {
-            if (checkBox.isChecked) {
+        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                Log.d("checkeduserid", userList[position].userId)
                 selectedUser.add(userList[position].userId)
-            } else if (!checkBox.isChecked) {
+            } else if (!isChecked) {
                 selectedUser.remove(userList[position].userId)
             }
         }

@@ -21,17 +21,26 @@ class CustomAdapter(context: Context, list: ArrayList<Message>) :
         RecyclerView.ViewHolder(itemView) {
         var messageTV: TextView
         var dateTV: TextView
+        var userNameTV: TextView
         fun bind(position: Int) {
             val messageModel: Message = list[position]
             messageTV.text = messageModel.text
             dateTV.setText(
                 DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
             )
+            if (SharedPref.get(Constants.CHAT_TYPE) == Constants.CHATS) {
+                userNameTV.visibility = View.GONE
+            }
+            else {
+                userNameTV.visibility = View.VISIBLE
+                userNameTV.text = messageModel.senderId
+            }
         }
 
         init {
             messageTV = itemView.findViewById(R.id.message_text)
             dateTV = itemView.findViewById(R.id.date_text)
+            userNameTV = itemView.findViewById(R.id.senderNameTV)
         }
     }
 

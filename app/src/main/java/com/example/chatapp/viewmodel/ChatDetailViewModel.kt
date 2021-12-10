@@ -34,7 +34,7 @@ class ChatDetailViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
-                    FirebaseDatabaseService.sendTextToDb(
+                    FirebaseDatabaseService.sendTextToUserDb(
                         sender,
                         peerid, text
                     )
@@ -49,11 +49,42 @@ class ChatDetailViewModel: ViewModel() {
     @ExperimentalCoroutinesApi
     fun updateMessages(peerid: String) {
         viewModelScope.launch {
-
             AuthenticationService.getUserID()?.let { sender ->
-                 FirebaseDatabaseService.getUpdatedChatsFromDb(sender, peerid).collect{
-                     _userchatsFromDb.value = it
+                try {
+                    FirebaseDatabaseService.getUpdatedChatsFromDb(sender, peerid).collect{
+                        _userchatsFromDb.value = it
+                    }
+                }
+                 catch (ex: Exception) {
+                     ex.printStackTrace()
                  }
+            }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun getGroupMessages(groupId: String) {
+        viewModelScope.launch {
+            try {
+                FirebaseDatabaseService.getUpdatedGroupChatsFromDb(groupId).collect{
+                    _userchatsFromDb.value = it
+            }
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    fun sendMsgToGroup(groupId: String, message: String) {
+        viewModelScope.launch {
+            try {
+                _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
+                    FirebaseDatabaseService.sendTextToGroupDb(sender, groupId, message)
+                }
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
             }
         }
     }

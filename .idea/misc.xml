@@ -3,16 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../layout/custom_preview.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/circle.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_groups_24.xml" value="0.13518518518518519" />
+        <entry key="app/src/main/res/drawable/ic_group_add.xml" value="0.188671875" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.13518518518518519" />
+        <entry key="app/src/main/res/drawable/message_bg.xml" value="0.188671875" />
         <entry key="app/src/main/res/drawable/msgedittextbg.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/profile_button_bg.xml" value="0.188671875" />
+        <entry key="app/src/main/res/drawable/rec_msg_bg.xml" value="0.188671875" />
         <entry key="app/src/main/res/drawable/roundbtn.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/send_button_bg.xml" value="0.188671875" />
         <entry key="app/src/main/res/drawable/sendbuttonbg.xml" value="0.13518518518518519" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.14719202898550723" />
         <entry key="app/src/main/res/layout/chats_layout.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_chat_details.xml" value="0.165" />
-        <entry key="app/src/main/res/layout/fragment_edit_profile.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/fragment_edit_profile.xml" value="0.15385097994119787" />
         <entry key="app/src/main/res/layout/fragment_group_chat.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/layout/fragment_otp_login_page.xml" value="0.25" />

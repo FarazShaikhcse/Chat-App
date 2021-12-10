@@ -19,7 +19,7 @@ class CreateGroupViewModel: ViewModel() {
     @InternalCoroutinesApi
     fun getUserListFromDb() {
         viewModelScope.launch {
-            FirebaseDatabaseService.getAllUsersFromDbFlow().collect {
+            FirebaseDatabaseService.getAllUsersFromDb().collect {
                 userList.clear()
                 userList.addAll(it as ArrayList<User>)
                 _getUserListStatus.postValue(true)

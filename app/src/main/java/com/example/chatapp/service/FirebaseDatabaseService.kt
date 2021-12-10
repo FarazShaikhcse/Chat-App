@@ -1,7 +1,9 @@
 package com.example.chatapp.service
 
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.chatapp.util.Constants
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.collections.ArrayList
 import kotlin.coroutines.suspendCoroutine
+import kotlin.streams.asSequence
 
 object FirebaseDatabaseService {
     suspend fun writeUserDataToDatabase(user: User): Boolean {
@@ -31,15 +34,18 @@ object FirebaseDatabaseService {
             }
         }
     }
+
     suspend fun readUserDataToDatabase(): User {
         return suspendCoroutine { cont ->
             val db = FirebaseFirestore.getInstance()
             AuthenticationService.getUserID()?.let {
                 db.collection(Constants.USERS).document(it)
                     .get().addOnSuccessListener {
-                        val user = User(it.get(Constants.USERNAME).toString(),
+                        val user = User(
+                            it.get(Constants.USERNAME).toString(),
                             it.get(Constants.ABOUT).toString(), it.get(Constants.USERID).toString(),
-                        it.get(Constants.PFP_URI).toString())
+                            it.get(Constants.PFP_URI).toString()
+                        )
                         cont.resumeWith(Result.success(user))
                     }
                     .addOnFailureListener {
@@ -60,7 +66,7 @@ object FirebaseDatabaseService {
                     .get().addOnSuccessListener {
 
                         it.reference.collection(Constants.MESSAGES)
-                            .orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
+                            .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
                             .limit(limit).get()
                             .addOnSuccessListener {
                                 val msgList = arrayListOf<Message>()
@@ -89,16 +95,16 @@ object FirebaseDatabaseService {
             }
         }
     }
+
     private fun getChatDocid(senderId: String, recId: String): String {
         if (senderId > recId) {
             return recId + "_" + senderId
-        }
-        else {
-            return senderId + "_" +  recId
+        } else {
+            return senderId + "_" + recId
         }
     }
 
-    suspend fun sendTextToDb(senderId: String, receiverId:String, message: String):Boolean {
+    suspend fun sendTextToUserDb(senderId: String, receiverId: String, message: String): Boolean {
         val chatId = getChatDocid(senderId, receiverId)
         val dbMessage = Message(
             senderId,
@@ -107,12 +113,12 @@ object FirebaseDatabaseService {
             "text",
         )
         val db = FirebaseFirestore.getInstance()
-        return suspendCoroutine {   callback ->
+        return suspendCoroutine { callback ->
             db.collection(Constants.CHATS).document(chatId).collection(Constants.MESSAGES)
-                .add(dbMessage).addOnCompleteListener { task->
-                    if(task.isSuccessful) {
+                .add(dbMessage).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
                         callback.resumeWith(Result.success(true))
-                    }else {
+                    } else {
                         callback.resumeWith(
                             Result.failure(task.exception ?: Exception("Something went wrong"))
                         )
@@ -128,16 +134,17 @@ object FirebaseDatabaseService {
             val chatId = getChatDocid(senderId, receiverId)
             val db = FirebaseFirestore.getInstance()
             val ref = db.collection(Constants.CHATS).document(chatId)
-                .collection(Constants.MESSAGES).orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
+                .collection(Constants.MESSAGES)
+                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
                 .addSnapshotListener { value, error ->
-                    if(error != null) {
+                    if (error != null) {
                         this.trySend(null).isFailure
                         error.printStackTrace()
-                    }else {
-                        if(value != null) {
+                    } else {
+                        if (value != null) {
                             val messageList = arrayListOf<Message>()
-                            for(item in value.documents) {
-                                val data = item.data as HashMap<*,*>
+                            for (item in value.documents) {
+                                val data = item.data as HashMap<*, *>
                                 val message = Message(
                                     senderId = data[Constants.SENDERID].toString(),
                                     sentTime = data[Constants.SENT_TIME] as Long,
@@ -152,32 +159,6 @@ object FirebaseDatabaseService {
                 }
             awaitClose() {
                 ref.remove()
-            }
-        }
-    }
-
-    suspend fun getAllUsersFromDb(): MutableList<User>? {
-        return suspendCoroutine { cont ->
-            val userList = mutableListOf<User>()
-            val db = FirebaseFirestore.getInstance()
-            AuthenticationService.getUserID()?.let {
-                db.collection(Constants.USERS)
-                    .whereNotEqualTo(Constants.USERID, it)
-                    .get().addOnSuccessListener {
-                        for ( doc in it ) {
-                            val user = User(
-                                doc.get(Constants.USERNAME).toString(),
-                                doc.get(Constants.ABOUT).toString(),
-                                doc.get(Constants.USERID).toString(),
-                                doc.get(Constants.PFP_URI).toString()
-                            )
-                            userList.add(user)
-                        }
-                        cont.resumeWith(Result.success(userList))
-                    }
-                    .addOnFailureListener {
-                        cont.resumeWith(Result.failure(it))
-                    }
             }
         }
     }
@@ -198,15 +179,15 @@ object FirebaseDatabaseService {
         }
     }
 
-    fun getAllUsersFromDbFlow(): Flow<ArrayList<User>?> {
+    fun getAllUsersFromDb(): Flow<ArrayList<User>?> {
 
         return callbackFlow {
             val uid = AuthenticationService.getUserID()
             val userList = ArrayList<User>()
-            val ref = FirebaseFirestore.getInstance().collection("users")
+            val ref = FirebaseFirestore.getInstance().collection(Constants.USERS)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        this.offer(null)
+                        this.trySend(null).isSuccess
                         error.printStackTrace()
                     } else {
                         if (snapshot != null) {
@@ -216,15 +197,17 @@ object FirebaseDatabaseService {
                                     if (item.id == uid) {
                                         continue
                                     } else {
-                                        val user = User( item.get(Constants.USERNAME).toString(),
-                                        item.get(Constants.ABOUT).toString(),
-                                        item.get(Constants.USERID).toString(),
-                                        item.get(Constants.PFP_URI).toString())
+                                        val user = User(
+                                            item.get(Constants.USERNAME).toString(),
+                                            item.get(Constants.ABOUT).toString(),
+                                            item.get(Constants.USERID).toString(),
+                                            item.get(Constants.PFP_URI).toString()
+                                        )
                                         userList.add(user)
                                     }
                                 }
                             }
-                            this.offer(userList)
+                            this.trySend(userList).isSuccess
                         }
                     }
                 }
@@ -235,21 +218,139 @@ object FirebaseDatabaseService {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     suspend fun createGrp(name: String, userList: ArrayList<String>?): Boolean? {
         return suspendCoroutine { cont ->
             val db = FirebaseFirestore.getInstance()
-            val group = userList?.let { GroupChat(it, name, emptyList<Message>()) }
-            AuthenticationService.getUserID()?.let {
-                if (group != null) {
-                    db.collection(Constants.GROUPS).document()
-                        .set(group).addOnSuccessListener {
-                            cont.resumeWith(Result.success(true))
-                        }
-                        .addOnFailureListener {
-                            cont.resumeWith(Result.failure(it))
-                        }
-                }
+            val source = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+            val randomId = java.util.Random().ints(36, 0, source.length)
+                .asSequence()
+                .map(source::get)
+                .joinToString("")
+            val group = userList?.let { list ->
+                AuthenticationService.getUserID()?.let { list.add(it) }
+                GroupChat(randomId, list, name, messages = listOf(
+                    Message(list[list.size - 1],
+                System.currentTimeMillis(), "Welcome to Group $name", "text"
+                    )
+                ))
+            }
+
+            if (group != null) {
+
+                db.collection(Constants.GROUPS).document(randomId)
+                    .set(group).addOnSuccessListener {
+                        cont.resumeWith(Result.success(true))
+                    }
+                    .addOnFailureListener {
+                        cont.resumeWith(Result.failure(it))
+                    }
             }
         }
     }
+
+
+    fun getGroupsFromDb(): Flow<ArrayList<GroupChat>?> {
+
+        return callbackFlow {
+            val uid = AuthenticationService.getUserID()
+            val groupList = ArrayList<GroupChat>()
+            val ref = uid?.let {
+                FirebaseFirestore.getInstance().collection(Constants.GROUPS)
+                    .whereArrayContains(Constants.PARTICIPANTS, it)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            this.trySend(null).isSuccess
+                            error.printStackTrace()
+                        } else {
+                            if (snapshot != null) {
+                                for (doc in snapshot.documentChanges) {
+                                    if (doc.type == DocumentChange.Type.ADDED) {
+                                        val item = doc.document
+                                        if (item.id == uid) {
+                                            continue
+                                        } else {
+                                            val group = GroupChat(
+                                                item.get(Constants.GROUP_ID).toString(),
+                                                item.get(Constants.PARTICIPANTS) as ArrayList<String>,
+                                                item.get(Constants.GROUP_NAME).toString(),
+                                                item.get(Constants.PFP_URI).toString(),
+                                                item.get(Constants.MESSAGES) as List<Message>
+                                            )
+                                            groupList.add(group)
+                                        }
+                                    }
+                                }
+                                Log.d("groupList", groupList.size.toString())
+                                this.trySend(groupList).isSuccess
+                            }
+                        }
+                    }
+            }
+            awaitClose {
+                ref?.remove()
+            }
+        }
+
+    }
+
+    @ExperimentalCoroutinesApi
+    fun getUpdatedGroupChatsFromDb(groupId: String):
+            Flow<ArrayList<Message>?> {
+        return callbackFlow {
+            val db = FirebaseFirestore.getInstance()
+            val ref = db.collection(Constants.GROUPS).document(groupId)
+                .collection(Constants.MESSAGES)
+                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        this.trySend(null).isFailure
+                        error.printStackTrace()
+                    } else {
+                        if (value != null) {
+                            val messageList = arrayListOf<Message>()
+                            for (item in value.documents) {
+                                val data = item.data as HashMap<*, *>
+                                val message = Message(
+                                    senderId = data[Constants.SENDERID].toString(),
+                                    sentTime = data[Constants.SENT_TIME] as Long,
+                                    text = data[Constants.TEXT].toString(),
+                                    messageType = data[Constants.MESSAGE_TYPE].toString(),
+                                )
+                                messageList.add(message)
+                            }
+                            this.trySend(messageList).isSuccess
+                        }
+                    }
+                }
+            awaitClose() {
+                ref.remove()
+            }
+        }
+    }
+
+    suspend fun sendTextToGroupDb(sender: String, groupId: String, message: String): Boolean {
+        val dbMessage = Message(
+            sender,
+            System.currentTimeMillis(),
+            message,
+            "text",
+        )
+        val db = FirebaseFirestore.getInstance()
+        return suspendCoroutine { callback ->
+            db.collection(Constants.GROUPS).document(groupId).collection(Constants.MESSAGES)
+                .add(dbMessage).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        callback.resumeWith(Result.success(true))
+                    } else {
+                        callback.resumeWith(
+                            Result.failure(task.exception ?: Exception("Something went wrong"))
+                        )
+                    }
+                }
+        }
+    }
+
+
 }

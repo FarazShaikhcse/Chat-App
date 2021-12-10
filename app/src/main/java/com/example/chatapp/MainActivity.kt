@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
     fun navigatePage(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment, fragment)
+            addToBackStack(null)
             commit()
         }
     }

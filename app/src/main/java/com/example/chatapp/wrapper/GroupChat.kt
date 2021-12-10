@@ -1,4 +1,7 @@
 package com.example.chatapp.wrapper
 
-data class GroupChat(val participants: ArrayList<String>, val groupName: String, val messages: List<Message>) {
-}
+import java.io.Serializable
+
+data class GroupChat(val groupId: String, val participants: ArrayList<String>, val groupName: String,
+                     var pfpUri: String = "",
+                     var messages: List<Message> = emptyList()): Serializable { }

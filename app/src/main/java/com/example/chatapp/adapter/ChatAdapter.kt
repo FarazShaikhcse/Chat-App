@@ -1,4 +1,4 @@
-package com.example.chatapp.util
+package com.example.chatapp.adapter
 
 import android.content.Context
 import android.net.Uri
@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chatapp.R
-import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.wrapper.User
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.collections.ArrayList
