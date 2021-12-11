@@ -48,7 +48,6 @@ class SingleChatFragment : Fragment() {
         recyclerView.adapter = adapter
         adapter.setOnItemClickListener(object : ChatAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                saveClickedChatDetails(position)
                 val args = Bundle()
                 args.putString(Constants.CHAT_TYPE, Constants.CHATS)
                 args.putSerializable("clicked_chat", userList[position])
@@ -59,20 +58,9 @@ class SingleChatFragment : Fragment() {
                     addToBackStack(null)
                     commit()
                 }
-//                sharedViewModel.setGoToChatDetailsPageStatus(true)
-//                chatFragmentHostListener?.onChatItemClicked(position)
             }
         })
-//        singleChatViewModel.getChatsFromDB(1)
         singleChatViewModel.getAllUsers()
-        singleChatViewModel.userchatsFromDb.observe(viewLifecycleOwner){
-
-
-//            for (i in 0 until it.size) {
-//                chatList.add(it[i])
-//                adapter.notifyItemInserted(i)
-//            }
-        }
         singleChatViewModel.readUsersFromDb.observe(viewLifecycleOwner) {
             Log.d("checkback", "entered")
             userList.clear()
@@ -80,10 +68,6 @@ class SingleChatFragment : Fragment() {
             adapter.notifyDataSetChanged()
         }
         return view
-    }
-
-    private fun saveClickedChatDetails(position: Int) {
-            SharedPref.addString(Constants.USERID, userList[position].userId)
     }
 
     interface ChatFragmentHostListener {

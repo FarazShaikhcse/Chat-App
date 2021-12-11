@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.chatapp.util.Constants
+import com.example.chatapp.util.SharedPref
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
 import com.example.chatapp.wrapper.User
@@ -35,7 +36,7 @@ object FirebaseDatabaseService {
         }
     }
 
-    suspend fun readUserDataToDatabase(): User {
+    suspend fun readUserDataFromDatabase(): User {
         return suspendCoroutine { cont ->
             val db = FirebaseFirestore.getInstance()
             AuthenticationService.getUserID()?.let {
@@ -76,7 +77,8 @@ object FirebaseDatabaseService {
                                             msg.getString(Constants.SENDERID)!!,
                                             msg.get(Constants.SENT_TIME)!! as Long,
                                             msg.getString(Constants.TEXT)!!,
-                                            msg.getString(Constants.MESSAGE_TYPE)!!
+                                            msg.getString(Constants.MESSAGE_TYPE)!!,
+                                            msg.get(Constants.SENDER_NAME).toString()
                                         )
                                     )
                                 }
@@ -104,13 +106,14 @@ object FirebaseDatabaseService {
         }
     }
 
-    suspend fun sendTextToUserDb(senderId: String, receiverId: String, message: String): Boolean {
+    suspend fun sendTextToUserDb(senderId: String, receiverId: String, message: String, msgType: String): Boolean {
         val chatId = getChatDocid(senderId, receiverId)
         val dbMessage = Message(
             senderId,
             System.currentTimeMillis(),
             message,
-            "text",
+            msgType,
+            senderName = SharedPref.get(Constants.USERNAME).toString()
         )
         val db = FirebaseFirestore.getInstance()
         return suspendCoroutine { callback ->
@@ -150,6 +153,7 @@ object FirebaseDatabaseService {
                                     sentTime = data[Constants.SENT_TIME] as Long,
                                     text = data[Constants.TEXT].toString(),
                                     messageType = data[Constants.MESSAGE_TYPE].toString(),
+                                    senderName = data[Constants.SENDER_NAME].toString()
                                 )
                                 messageList.add(message)
                             }
@@ -317,6 +321,7 @@ object FirebaseDatabaseService {
                                     sentTime = data[Constants.SENT_TIME] as Long,
                                     text = data[Constants.TEXT].toString(),
                                     messageType = data[Constants.MESSAGE_TYPE].toString(),
+                                    senderName = data[Constants.SENDER_NAME].toString()
                                 )
                                 messageList.add(message)
                             }
@@ -330,12 +335,13 @@ object FirebaseDatabaseService {
         }
     }
 
-    suspend fun sendTextToGroupDb(sender: String, groupId: String, message: String): Boolean {
+    suspend fun sendTextToGroupDb(sender: String, groupId: String, message: String, msgType: String): Boolean {
         val dbMessage = Message(
             sender,
             System.currentTimeMillis(),
             message,
-            "text",
+            msgType,
+            senderName = SharedPref.get(Constants.USERNAME).toString()
         )
         val db = FirebaseFirestore.getInstance()
         return suspendCoroutine { callback ->

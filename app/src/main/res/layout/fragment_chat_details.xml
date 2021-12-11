@@ -28,7 +28,7 @@
                     android:id="@+id/backButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:src="@drawable/ic_baseline_arrow_back_24"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -59,7 +59,8 @@
             android:id="@+id/sendMsgBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/send_button_bg"
             android:gravity="center_vertical|center_horizontal"
@@ -68,26 +69,44 @@
             android:src="@drawable/ic_baseline_send_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/msgeditText" />
+            app:layout_constraintStart_toEndOf="@id/send_message_layout" />
 
-        <EditText
-            android:id="@+id/msgeditText"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="60dp"
-            android:layout_marginBottom="8dp"
-            android:height="48dp"
-            android:background="@drawable/msgedittextbg"
-            android:hint="@string/TypeaMessage"
-            android:paddingStart="8dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/msghintcolor"
+            android:layout_marginEnd="8dp"
+            android:id="@+id/send_message_layout"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/sendMsgBtn"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <EditText
+                android:id="@+id/msgeditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                android:height="48dp"
+                android:background="@drawable/msgedittextbg"
+                android:hint="@string/TypeaMessage"
+                android:paddingStart="8dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/msghintcolor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/sendImageBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_camera"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatsRV"
@@ -95,7 +114,8 @@
             android:layout_height="0dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/msgeditText"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/send_message_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"

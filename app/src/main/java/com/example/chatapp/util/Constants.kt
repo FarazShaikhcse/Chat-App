@@ -1,6 +1,8 @@
 package com.example.chatapp.util
 
 object Constants {
+    const val IMAGE = "image"
+    const val SENDER_NAME = "senderName"
     const val CHAT_TYPE = "chatType"
     const val GROUP_NAME = "groupName"
     const val GROUP_ID = "groupId"
@@ -19,4 +21,5 @@ object Constants {
     const val USERID = "userId"
     const val FUID = "fuid"
     const val PFP_URI = "pfpUri"
+    const val RC_SELECT_IMAGE = 999
 }

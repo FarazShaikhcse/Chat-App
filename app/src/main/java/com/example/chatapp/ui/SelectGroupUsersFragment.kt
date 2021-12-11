@@ -49,10 +49,10 @@ class SelectGroupUsersFragment : Fragment() {
     }
 
     private fun gotoSettingGrpNamePage() {
-        val selectedList = adapter.getSelectedList()
-        if (selectedList.size != 0) {
+        val selectedIdList = adapter.getSelectedUserIdList()
+        if (selectedIdList.size != 0) {
             val bundle = Bundle()
-            bundle.putStringArrayList(Constants.PARTICIPANTS, selectedList as ArrayList<String>)
+            bundle.putStringArrayList(Constants.PARTICIPANTS, selectedIdList as ArrayList<String>)
             val grpNameFragment = SetGroupNameFragment()
             grpNameFragment.arguments = bundle
             activity?.run {

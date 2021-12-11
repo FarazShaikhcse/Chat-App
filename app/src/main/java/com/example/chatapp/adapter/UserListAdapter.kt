@@ -19,7 +19,7 @@ class UserListAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<UserListAdapter.GroupChatUserViewHolder>() {
 
-    var selectedUser = mutableListOf<String>()
+    var selectedUserId = mutableListOf<String>()
 
     class GroupChatUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -43,9 +43,9 @@ class UserListAdapter(
         checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 Log.d("checkeduserid", userList[position].userId)
-                selectedUser.add(userList[position].userId)
+                selectedUserId.add(userList[position].userId)
             } else if (!isChecked) {
-                selectedUser.remove(userList[position].userId)
+                selectedUserId.remove(userList[position].userId)
             }
         }
         holder.itemView.apply {
@@ -61,7 +61,8 @@ class UserListAdapter(
         return userList.size
     }
 
-    fun getSelectedList(): MutableList<String> {
-        return selectedUser
+    fun getSelectedUserIdList(): MutableList<String> {
+        return selectedUserId
     }
+
 }

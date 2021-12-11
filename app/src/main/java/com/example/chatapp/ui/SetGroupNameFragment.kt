@@ -27,12 +27,12 @@ class SetGroupNameFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_set_group_name, container, false)
         grpNameVM =
             ViewModelProvider(this, SetGroupViewModelFactory())[SetGroupViewModel::class.java]
-        val selectedList = arguments?.getStringArrayList(Constants.PARTICIPANTS)
+        val selectedIdList = arguments?.getStringArrayList(Constants.PARTICIPANTS)
         grpName = view.findViewById(R.id.grpNameET)
         saveGrpfab = view.findViewById(R.id.saveGrpFAB)
         saveGrpfab.setOnClickListener {
-            if(grpName.text.isNotEmpty() && selectedList != null){
-                grpNameVM.createGrp(grpName.text.toString(),selectedList)
+            if(grpName.text.isNotEmpty() && selectedIdList != null){
+                grpNameVM.createGrp(grpName.text.toString(),selectedIdList)
             }
         }
         observe()

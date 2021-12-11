@@ -9,12 +9,16 @@ import com.example.chatapp.R
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.wrapper.Message
 import android.content.Context
+import android.net.Uri
+import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
 import java.text.DateFormat
 
 
 class CustomAdapter(context: Context, list: ArrayList<Message>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val context: Context
+    private val context: Context = context
     var list: ArrayList<Message>
 
     private inner class MessageInViewHolder internal constructor(itemView: View) :
@@ -22,25 +26,52 @@ class CustomAdapter(context: Context, list: ArrayList<Message>) :
         var messageTV: TextView
         var dateTV: TextView
         var userNameTV: TextView
+        var textMessageLayout: ConstraintLayout
+        var imageMessageLayout: ConstraintLayout
+        var recImage: ImageView
+        var imageSenderTextView: TextView
+        var imageSentTime: TextView
         fun bind(position: Int) {
             val messageModel: Message = list[position]
-            messageTV.text = messageModel.text
-            dateTV.setText(
-                DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
-            )
-            if (SharedPref.get(Constants.CHAT_TYPE) == Constants.CHATS) {
-                userNameTV.visibility = View.GONE
+            if (messageModel.messageType == Constants.TEXT) {
+                textMessageLayout.visibility = View.VISIBLE
+                imageMessageLayout.visibility = View.GONE
+                messageTV.text = messageModel.text
+                dateTV.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
+                if (SharedPref.get(Constants.CHAT_TYPE) == Constants.CHATS) {
+                    userNameTV.visibility = View.GONE
+                } else {
+                    userNameTV.visibility = View.VISIBLE
+                    userNameTV.text = messageModel.senderName
+                }
             }
             else {
-                userNameTV.visibility = View.VISIBLE
-                userNameTV.text = messageModel.senderId
+                textMessageLayout.visibility = View.GONE
+                imageMessageLayout.visibility = View.VISIBLE
+                if (SharedPref.get(Constants.CHAT_TYPE) == Constants.CHATS) {
+                    imageSenderTextView.visibility = View.GONE
+                } else {
+                    imageSenderTextView.visibility = View.VISIBLE
+                    imageSenderTextView.text = messageModel.senderName
+                }
+                imageSentTime.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
+                Glide.with(context)
+                    .load(Uri.parse(messageModel.text))
+                    .dontAnimate()
+                    .into(recImage)
+
             }
         }
 
         init {
             messageTV = itemView.findViewById(R.id.message_text)
             dateTV = itemView.findViewById(R.id.date_text)
-            userNameTV = itemView.findViewById(R.id.senderNameTV)
+            userNameTV = itemView.findViewById(R.id.textSenderNameTV)
+            textMessageLayout = itemView.findViewById(R.id.rec_msg_layout)
+            imageMessageLayout = itemView.findViewById(R.id.rec_img_layout)
+            recImage = itemView.findViewById(R.id.image_message)
+            imageSenderTextView = itemView.findViewById(R.id.imagesenderNameTV)
+            imageSentTime = itemView.findViewById(R.id.image_date)
         }
     }
 
@@ -48,17 +79,37 @@ class CustomAdapter(context: Context, list: ArrayList<Message>) :
         RecyclerView.ViewHolder(itemView) {
         var messageTV: TextView
         var dateTV: TextView
+        var sentMessageLayout: ConstraintLayout
+        var sentImageLayout:ConstraintLayout
+        var sentTime: TextView
+        var sentImage: ImageView
         fun bind(position: Int) {
             val messageModel: Message = list[position]
-            messageTV.setText(messageModel.text)
-            dateTV.setText(
-                DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
-            )
+            if (messageModel.messageType == Constants.TEXT) {
+                sentImageLayout.visibility = View.GONE
+                sentMessageLayout.visibility = View.VISIBLE
+                messageTV.text = messageModel.text
+                dateTV.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
+            }
+            else {
+                sentImageLayout.visibility = View.VISIBLE
+                sentMessageLayout.visibility = View.INVISIBLE
+                sentTime.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(messageModel.sentTime)
+                Glide.with(context)
+                    .load(Uri.parse(messageModel.text))
+                    .dontAnimate()
+                    .into(sentImage)
+            }
+
         }
 
         init {
             messageTV = itemView.findViewById(R.id.message_text)
             dateTV = itemView.findViewById(R.id.date_text)
+            sentImageLayout = itemView.findViewById(R.id.sentImageLayout)
+            sentMessageLayout = itemView.findViewById(R.id.sent_message_layout)
+            sentTime = itemView.findViewById(R.id.sentImagetime)
+            sentImage = itemView.findViewById(R.id.sentImage)
         }
     }
 
@@ -97,7 +148,6 @@ class CustomAdapter(context: Context, list: ArrayList<Message>) :
     }
 
     init { // you can pass other parameters in constructor
-        this.context = context
         this.list = list
     }
 }

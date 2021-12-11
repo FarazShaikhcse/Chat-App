@@ -1,7 +1,10 @@
 package com.example.chatapp.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +19,6 @@ import com.example.chatapp.viewmodel.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.chatapp.wrapper.Chat
 
 
 import com.example.chatapp.util.CustomAdapter
@@ -56,19 +58,18 @@ class ChatDetailsFragment : Fragment() {
             val selectedChat: User = bundle.getSerializable("clicked_chat") as User
             chatDetailViewModel.updateMessages(selectedChat.userId)
             binding.usernameTV.text = selectedChat.userName
-            if(selectedChat.pfpUri != "") {
+            if (selectedChat.pfpUri != "") {
                 context?.let {
                     Glide.with(it)
                         .load(Uri.parse(selectedChat.pfpUri))
                         .into(binding.profileImage)
                 }
             }
-        }
-        else if (bundle.getString(Constants.CHAT_TYPE) == Constants.GROUPS) {
+        } else if (bundle.getString(Constants.CHAT_TYPE) == Constants.GROUPS) {
             val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
             chatDetailViewModel.getGroupMessages(selectedChat.groupId)
             binding.usernameTV.text = selectedChat.groupName
-            if(selectedChat.pfpUri != "") {
+            if (selectedChat.pfpUri != "") {
                 context?.let {
                     Glide.with(it)
                         .load(Uri.parse(selectedChat.pfpUri))
@@ -98,11 +99,31 @@ class ChatDetailsFragment : Fragment() {
         chatDetailViewModel.messageSentStatus.observe(viewLifecycleOwner) {
             binding.msgeditText.setText("")
         }
+
+        chatDetailViewModel.imageUploadedStatus.observe(viewLifecycleOwner) {
+            if (it != null) {
+                if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
+                    val selectedChat: User = bundle.getSerializable("clicked_chat") as User
+                    chatDetailViewModel.sendMsgToUser(
+                        it.toString(),
+                        selectedChat.userId,
+                        Constants.IMAGE
+                    )
+                } else {
+                    val selectedChat: GroupChat =
+                        bundle.getSerializable("clicked_chat") as GroupChat
+                    chatDetailViewModel.sendMsgToGroup(
+                        selectedChat.groupId,
+                        it.toString(),
+                        Constants.IMAGE
+                    )
+                }
+            }
+        }
     }
 
     private fun clickListeners() {
         binding.backButton.setOnClickListener {
-            SharedPref.addString(Constants.USERID, "")
             requireActivity().supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, HomeFragment())
                 commit()
@@ -112,11 +133,33 @@ class ChatDetailsFragment : Fragment() {
             val text = binding.msgeditText.text.toString()
             if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
                 val selectedChat: User = bundle.getSerializable("clicked_chat") as User
-                chatDetailViewModel.sendMsgToUser(text, selectedChat.userId)
+                chatDetailViewModel.sendMsgToUser(text, selectedChat.userId, Constants.TEXT)
             } else {
                 val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
-                chatDetailViewModel.sendMsgToGroup(selectedChat.groupId, text)
+                chatDetailViewModel.sendMsgToGroup(selectedChat.groupId, text, Constants.TEXT)
             }
+        }
+        binding.sendImageBtn.setOnClickListener {
+            val intent = Intent().apply {
+                type = "image/*"
+                action = Intent.ACTION_GET_CONTENT
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/png"))
+            }
+            startActivityForResult(
+                Intent.createChooser(intent, "Select Image"),
+                Constants.RC_SELECT_IMAGE
+            )
+
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("image", "Inside onActivityresult")
+        if (requestCode == Constants.RC_SELECT_IMAGE && resultCode == Activity.RESULT_OK
+            && data != null && data.data != null
+        ) {
+            val selectedImagePath = data.data
+            chatDetailViewModel.uploadImageToStorage(selectedImagePath)
         }
     }
 }

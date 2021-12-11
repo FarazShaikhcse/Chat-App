@@ -29,7 +29,7 @@ class UserDetailsViewModel: ViewModel() {
 
     fun readUserDetails() {
         viewModelScope.launch {
-            _userDetailFetchedStatus.value = FirebaseDatabaseService.readUserDataToDatabase()
+            _userDetailFetchedStatus.value = FirebaseDatabaseService.readUserDataFromDatabase()
         }
     }
 

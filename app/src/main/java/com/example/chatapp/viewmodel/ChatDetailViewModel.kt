@@ -1,11 +1,13 @@
 package com.example.chatapp.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.service.FirebaseDatabaseService
+import com.example.chatapp.service.FirebaseStorageService
 import com.example.chatapp.wrapper.Message
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -14,10 +16,13 @@ import java.lang.Exception
 
 class ChatDetailViewModel: ViewModel() {
     private val _userchatsFromDb = MutableLiveData<MutableList<Message>>()
-        val userchatsFromDb = _userchatsFromDb as LiveData<MutableList<Message>>
+    val userchatsFromDb = _userchatsFromDb as LiveData<MutableList<Message>>
 
     private val _messageSentStatus = MutableLiveData<Boolean>()
     val messageSentStatus = _messageSentStatus as LiveData<Boolean>
+
+    private val _imageUploadedStatus = MutableLiveData<Uri?>()
+    val imageUploadedStatus = _imageUploadedStatus as LiveData<Uri?>
 
     fun getChatsFromDB(peerid: String, limit: Long) {
         viewModelScope.launch {
@@ -30,13 +35,13 @@ class ChatDetailViewModel: ViewModel() {
         }
     }
 
-    fun sendMsgToUser(text: String, peerid: String) {
+    fun sendMsgToUser(text: String, peerid: String, msgType: String) {
         viewModelScope.launch {
             try {
                 _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
                     FirebaseDatabaseService.sendTextToUserDb(
                         sender,
-                        peerid, text
+                        peerid, text, msgType
                     )
                 }
             }
@@ -76,12 +81,23 @@ class ChatDetailViewModel: ViewModel() {
         }
     }
 
-    fun sendMsgToGroup(groupId: String, message: String) {
+    fun sendMsgToGroup(groupId: String, message: String, msgType: String) {
         viewModelScope.launch {
             try {
                 _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
-                    FirebaseDatabaseService.sendTextToGroupDb(sender, groupId, message)
+                    FirebaseDatabaseService.sendTextToGroupDb(sender, groupId, message, msgType)
                 }
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    fun uploadImageToStorage(selectedImagePath: Uri?) {
+        viewModelScope.launch {
+            try {
+                _imageUploadedStatus.value = FirebaseStorageService.uploadImage(selectedImagePath)
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
