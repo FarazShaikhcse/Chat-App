@@ -1,18 +1,18 @@
 package com.example.chatapp.util
 
+import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.wrapper.Message
-import android.content.Context
-import android.net.Uri
-import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.bumptech.glide.Glide
 import java.text.DateFormat
 
 

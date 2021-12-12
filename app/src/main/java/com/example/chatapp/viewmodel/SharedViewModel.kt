@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class SharedViewModel : ViewModel() {
+class SharedViewModel: ViewModel() {
 
     private val _gotoWelcomePageStatus = MutableLiveData<Boolean>()
     val gotoWelcomePageStatus = _gotoWelcomePageStatus as LiveData<Boolean>
@@ -23,6 +23,9 @@ class SharedViewModel : ViewModel() {
 
     private val _gotoChatDetailsPageStatus = MutableLiveData<Boolean>()
     val gotoChatDetailsPageStatus = _gotoChatDetailsPageStatus as LiveData<Boolean>
+
+    private val _gotoSplashPageStatus = MutableLiveData<Boolean>()
+    val gotoSplashPageStatus = _gotoSplashPageStatus as LiveData<Boolean>
 
     fun setGoToWelcomePageStatus(status: Boolean) {
         _gotoWelcomePageStatus.value = status
@@ -46,6 +49,10 @@ class SharedViewModel : ViewModel() {
 
     fun setGoToChatDetailsPageStatus(status: Boolean) {
         _gotoChatDetailsPageStatus.value = status
+    }
+
+    fun setGotoSplashScreen(status: Boolean) {
+        _gotoSplashPageStatus.value = status
     }
 
 }

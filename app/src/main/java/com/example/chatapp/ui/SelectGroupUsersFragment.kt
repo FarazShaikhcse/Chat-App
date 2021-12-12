@@ -1,17 +1,17 @@
 package com.example.chatapp.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
+import com.example.chatapp.adapter.SelectChatAdapter
 import com.example.chatapp.util.Constants
-import com.example.chatapp.adapter.UserListAdapter
 import com.example.chatapp.viewmodel.CreateGroupViewModel
 import com.example.chatapp.viewmodel.CreateGroupViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -19,7 +19,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 class SelectGroupUsersFragment : Fragment() {
     lateinit var recyclerView: RecyclerView
-    lateinit var adapter: UserListAdapter
+    lateinit var adapter: SelectChatAdapter
     lateinit var fab: FloatingActionButton
     lateinit var createGroupViewModel: CreateGroupViewModel
 
@@ -36,7 +36,7 @@ class SelectGroupUsersFragment : Fragment() {
             CreateGroupViewModelFactory()
         )[CreateGroupViewModel::class.java]
         recyclerView = view.findViewById(R.id.user_list_recycler_view)
-        adapter = UserListAdapter(createGroupViewModel.userList, requireContext())
+        adapter = SelectChatAdapter(createGroupViewModel.userList, requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = adapter

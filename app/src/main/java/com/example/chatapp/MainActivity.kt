@@ -37,15 +37,20 @@ class MainActivity : AppCompatActivity() {
         SharedPref.initSharedPref(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         userDetailsViewModel.readUserDetails()
+        sharedViewModel.setGotoSplashScreen(true)
     }
 
     private fun observeNavigation() {
         userDetailsViewModel.userDetailFetchedStatus.observe(this@MainActivity) {
             SharedPref.addString(Constants.USERNAME, it.userName)
+            SharedPref.addString(Constants.USER_PFP, it.pfpUri)
         }
         sharedViewModel.gotoHomePageStatus.observe(this@MainActivity, {
             if (it) {
-                navigatePage(HomeFragment())
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.flFragment, HomeFragment())
+                    commit()
+                }
             }
         })
 
@@ -80,6 +85,12 @@ class MainActivity : AppCompatActivity() {
                 navigatePage(ChatDetailsFragment())
             }
         })
+
+        sharedViewModel.gotoSplashPageStatus.observe(this@MainActivity, {
+            if (it) {
+                navigatePage(SplashScreenFragment())
+            }
+        })
     }
 
     fun navigatePage(fragment: Fragment) {
@@ -90,16 +101,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (FirebaseAuth.getInstance().currentUser != null) {
-            AuthenticationService.getUserID()?.let { SharedPref.addString(Constants.FUID, it) }
-            sharedViewModel.setGotoHomePageStatus(true)
-        }
-        else {
-            sharedViewModel.setGoToWelcomePageStatus(true)
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbarmenu, menu)

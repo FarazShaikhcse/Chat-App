@@ -1,6 +1,10 @@
 package com.example.chatapp.util
 
 object Constants {
+    const val PARTICIPANTS_NAME = "participant_name"
+    const val PARTICIPANTS_PFP = "participant_pfp"
+    const val USER_PFP = "user_pfp"
+    const val IS_NEW_USER = "newUser"
     const val IMAGE = "image"
     const val SENDER_NAME = "senderName"
     const val CHAT_TYPE = "chatType"

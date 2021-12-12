@@ -3,7 +3,6 @@ package com.example.chatapp.ui
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.chatapp.databinding.FragmentEditProfileBinding
@@ -21,7 +21,6 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.viewmodel.UserDetailsViewModel
 import com.example.chatapp.viewmodel.UserDetailsViewModelFactory
 import com.example.chatapp.wrapper.User
-import kotlin.streams.asSequence
 
 
 class EditProfileFragment : Fragment() {

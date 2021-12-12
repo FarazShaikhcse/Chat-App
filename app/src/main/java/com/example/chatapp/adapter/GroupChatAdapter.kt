@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.wrapper.GroupChat
-import com.example.chatapp.wrapper.User
 import de.hdodenhof.circleimageview.CircleImageView
 
 class GroupChatAdapter(
@@ -50,7 +49,7 @@ class GroupChatAdapter(
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
         val username = holder.itemView.findViewById<TextView>(R.id.chatUsernameTV)
-        val message = holder.itemView.findViewById<TextView>(R.id.messageTV)
+        val message = holder.itemView.findViewById<TextView>(R.id.aboutTV)
         val pfp = holder.itemView.findViewById<CircleImageView>(R.id.chatProfilePFP)
 
         holder.itemView.apply {

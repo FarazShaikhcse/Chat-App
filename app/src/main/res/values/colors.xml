@@ -11,4 +11,5 @@
     <color name="msghintcolor">#707980</color>
     <color name="sent_msg_color">#007f6e</color>
     <color name="chat_color">#18252D</color>
+    <color name="chats_bg">#101D25</color>
 </resources>

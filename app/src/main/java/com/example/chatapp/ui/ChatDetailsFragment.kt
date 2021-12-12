@@ -1,27 +1,30 @@
 package com.example.chatapp.ui
 
+
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.chatapp.R
-import com.example.chatapp.databinding.FragmentChatDetailsBinding
-import com.example.chatapp.util.Constants
-import com.example.chatapp.util.SharedPref
-import com.example.chatapp.viewmodel.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-
-
+import com.example.chatapp.R
+import com.example.chatapp.databinding.FragmentChatDetailsBinding
+import com.example.chatapp.util.Constants
 import com.example.chatapp.util.CustomAdapter
+import com.example.chatapp.util.SharedPref
+import com.example.chatapp.viewmodel.ChatDetailViewModel
+import com.example.chatapp.viewmodel.ChatDetailViewModelFactory
+import com.example.chatapp.viewmodel.SharedViewModel
+import com.example.chatapp.viewmodel.SharedViewModelFactory
+import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
 import com.example.chatapp.wrapper.User
@@ -55,7 +58,7 @@ class ChatDetailsFragment : Fragment() {
         bundle = requireArguments()
         bundle.getString(Constants.CHAT_TYPE)?.let { SharedPref.addString(Constants.CHAT_TYPE, it) }
         if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
-            val selectedChat: User = bundle.getSerializable("clicked_chat") as User
+            val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
             chatDetailViewModel.updateMessages(selectedChat.userId)
             binding.usernameTV.text = selectedChat.userName
             if (selectedChat.pfpUri != "") {
@@ -77,9 +80,10 @@ class ChatDetailsFragment : Fragment() {
                 }
             }
         }
-//        binding.msgeditText.setOnClickListener {
-//            recyclerView.scrollToPosition(adapter.itemCount - 1)
-//        }
+        if (bundle.getString(Constants.IS_NEW_USER) == "true") {
+            val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
+            chatDetailViewModel.addNewUserChat(selectedChat)
+        }
         observeData()
         clickListeners()
         return view
@@ -120,6 +124,11 @@ class ChatDetailsFragment : Fragment() {
                 }
             }
         }
+        chatDetailViewModel.chatCreatedStatus.observe(viewLifecycleOwner) {
+            if (it) {
+                Log.d("chatregisterstatus", it.toString())
+            }
+        }
     }
 
     private fun clickListeners() {
@@ -131,8 +140,9 @@ class ChatDetailsFragment : Fragment() {
         }
         binding.sendMsgBtn.setOnClickListener {
             val text = binding.msgeditText.text.toString()
+
             if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
-                val selectedChat: User = bundle.getSerializable("clicked_chat") as User
+                val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
                 chatDetailViewModel.sendMsgToUser(text, selectedChat.userId, Constants.TEXT)
             } else {
                 val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat

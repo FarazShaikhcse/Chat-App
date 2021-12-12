@@ -10,12 +10,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chatapp.R
-import com.example.chatapp.wrapper.User
+import com.example.chatapp.wrapper.ChatUser
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.collections.ArrayList
 
 class ChatAdapter(
-    var users: MutableList<User>, val context: Context
+    var users: MutableList<ChatUser?>, val context: Context
 ) : RecyclerView.Adapter<ChatAdapter.ChatsViewHolder>() {
 
     inner class ChatsViewHolder(itemview: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemview) {
@@ -31,10 +31,10 @@ class ChatAdapter(
     }
 
     private lateinit var mListner: OnItemClickListener
-    var userList: ArrayList<User> = ArrayList()
+    var userList: ArrayList<ChatUser> = ArrayList()
 
     init {
-        userList = users as ArrayList<User>
+        userList = users as ArrayList<ChatUser>
 
     }
 
@@ -49,12 +49,16 @@ class ChatAdapter(
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
         val username = holder.itemView.findViewById<TextView>(R.id.chatUsernameTV)
-        val message = holder.itemView.findViewById<TextView>(R.id.messageTV)
+        val message = holder.itemView.findViewById<TextView>(R.id.aboutTV)
         val pfp = holder.itemView.findViewById<CircleImageView>(R.id.chatProfilePFP)
 
         holder.itemView.apply {
             username.text = userList[position].userName
-//            message.text = userList[position].message[0].text
+            val imagePattern = Regex("^https://firebasestorage.googleapis.com")
+            if (imagePattern.containsMatchIn(userList[position].recentMsg) )
+                message.text = "Image"
+            else
+                message.text = userList[position].recentMsg
             Log.d("uri", userList[position].pfpUri)
             if(userList[position].pfpUri != "") {
                 Glide.with(context)

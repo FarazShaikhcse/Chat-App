@@ -6,17 +6,12 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
-import com.example.chatapp.wrapper.GroupChat
-import com.example.chatapp.wrapper.Message
-import com.example.chatapp.wrapper.User
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.example.chatapp.wrapper.*
+import com.google.firebase.firestore.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlin.collections.ArrayList
 import kotlin.coroutines.suspendCoroutine
 import kotlin.streams.asSequence
 
@@ -106,7 +101,12 @@ object FirebaseDatabaseService {
         }
     }
 
-    suspend fun sendTextToUserDb(senderId: String, receiverId: String, message: String, msgType: String): Boolean {
+    suspend fun sendTextToUserDb(
+        senderId: String,
+        receiverId: String,
+        message: String,
+        msgType: String
+    ): Boolean {
         val chatId = getChatDocid(senderId, receiverId)
         val dbMessage = Message(
             senderId,
@@ -234,11 +234,14 @@ object FirebaseDatabaseService {
                 .joinToString("")
             val group = userList?.let { list ->
                 AuthenticationService.getUserID()?.let { list.add(it) }
-                GroupChat(randomId, list, name, messages = listOf(
-                    Message(list[list.size - 1],
-                System.currentTimeMillis(), "Welcome to Group $name", "text"
+                GroupChat(
+                    randomId, list, name, messages = listOf(
+                        Message(
+                            list[list.size - 1],
+                            System.currentTimeMillis(), "Welcome to Group $name", "text"
+                        )
                     )
-                ))
+                )
             }
 
             if (group != null) {
@@ -335,7 +338,12 @@ object FirebaseDatabaseService {
         }
     }
 
-    suspend fun sendTextToGroupDb(sender: String, groupId: String, message: String, msgType: String): Boolean {
+    suspend fun sendTextToGroupDb(
+        sender: String,
+        groupId: String,
+        message: String,
+        msgType: String
+    ): Boolean {
         val dbMessage = Message(
             sender,
             System.currentTimeMillis(),
@@ -358,5 +366,159 @@ object FirebaseDatabaseService {
         }
     }
 
+    suspend fun getChatsFromDB(limit: Long): MutableList<ChatUser?> {
+        return suspendCoroutine { cont ->
+            val db = FirebaseFirestore.getInstance()
+            var userList: List<ChatUser> = emptyList()
+            AuthenticationService.getUserID()?.let { recid ->
+                Log.d("userid", recid)
+                var peername = ""
+                var pfpUri = ""
+                var peerid = ""
+                var userDoc: DocumentSnapshot? = null
+                val requests = ArrayList<Deferred<ChatUser>>()
+                db.collection(Constants.CHATS)
+                    .whereArrayContains(Constants.PARTICIPANTS, recid)
+                    .get().addOnSuccessListener {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            var chatUser: ChatUser? = null
+                            for (doc in it) {
+                                val participants =
+                                    doc.get(Constants.PARTICIPANTS) as ArrayList<String>
+                                val names =
+                                    doc.get(Constants.PARTICIPANTS_NAME) as ArrayList<String>
+                                val pfps = doc.get(Constants.PARTICIPANTS_PFP) as ArrayList<String>
+                                if (participants[0] == SharedPref.get(Constants.USERID)) {
+                                    peerid = participants[1]
+                                    peername = names[1]
+                                    pfpUri = pfps[1]
+                                } else {
+                                    peerid = participants[0]
+                                    peername = names[0]
+                                    pfpUri = pfps[0]
+                                }
+                                delay(500)
+                                requests.add(async {
+                                    getMessages(
+                                        peerid,
+                                        peername,
+                                        pfpUri,
+                                        limit,
+                                        doc
+                                    )
+                                })
+                            }
+                            val chats = requests.awaitAll()
+                            cont.resumeWith(Result.success(chats.toMutableList()))
+                            Log.d("chatlist", chats.size.toString())
+                        }
+                    }
+                    .addOnFailureListener {
+                        cont.resumeWith(Result.failure(it))
+                        Log.d("chatsfromdb", it.toString())
+                    }
+            }
 
+        }
+    }
+
+    suspend fun getMessages(
+        peerid: String,
+        peername: String,
+        pfpUri: String,
+        limit: Long,
+        doc: QueryDocumentSnapshot
+    ) =
+        suspendCoroutine<ChatUser> { cont ->
+
+            lateinit var chatUser: ChatUser
+            doc.reference.collection(Constants.MESSAGES)
+                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
+                .limit(limit).get()
+                .addOnSuccessListener {
+
+                    for (msg in it.documents) {
+                        chatUser = ChatUser(
+                            peername,
+                            peerid,
+                            msg.get(Constants.TEXT) as String,
+                            msg.get(Constants.SENT_TIME) as Long,
+                            pfpUri
+                        )
+                    }
+                    cont.resumeWith(Result.success(chatUser))
+                }
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                }
+        }
+
+    suspend fun getChatUsersFromDb(): ArrayList<User>? {
+        return suspendCoroutine { cont ->
+            val userList = ArrayList<User>()
+            val db = FirebaseFirestore.getInstance()
+            val cuid = SharedPref.get(Constants.USERID).toString()
+            db.collection(Constants.USERS)
+                .whereNotEqualTo(Constants.USERID, cuid)
+                .get().addOnSuccessListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        for (doc in it) {
+                            delay(100)
+                            if (!checkIfChatExists(cuid, doc.get(Constants.USERID) as String))
+                                userList.add(
+                                    User(
+                                        doc.get(Constants.USERNAME) as String,
+                                        doc.get(Constants.ABOUT) as String,
+                                        doc.get(Constants.USERID) as String,
+                                        doc.get(Constants.PFP_URI) as String
+                                    )
+                                )
+                        }
+                        Log.d("selectChatuser", userList.size.toString())
+                        cont.resumeWith(Result.success(userList))
+                    }
+                }
+
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                    Log.d("chatsfromdb", it.toString())
+                }
+        }
+
+    }
+
+
+    private suspend fun checkIfChatExists(user1: String, user2: String): Boolean {
+        val db = FirebaseFirestore.getInstance()
+        return suspendCoroutine { cont ->
+            db.collection(Constants.CHATS).document(getChatDocid(user1, user2)).get()
+                .addOnCompleteListener {
+                    cont.resumeWith(Result.success(it.result!!.exists()))
+                }
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                }
+        }
+    }
+
+    suspend fun addNewUserChat(peerId: ChatUser): Boolean? {
+        val db = FirebaseFirestore.getInstance()
+        val cuid = SharedPref.get(Constants.USERID).toString()
+        val cuid_pfp = SharedPref.get(Constants.USER_PFP).toString()
+        val cuid_name = SharedPref.get(Constants.USERNAME).toString()
+        return suspendCoroutine { cont ->
+            val chat = hashMapOf(
+                Constants.PARTICIPANTS to listOf<String>(cuid, peerId.userId),
+                Constants.PARTICIPANTS_PFP to listOf<String>(cuid_pfp, peerId.pfpUri),
+                Constants.PARTICIPANTS_NAME to listOf<String>(cuid_name, peerId.userName)
+            )
+            db.collection(Constants.CHATS).document(getChatDocid(peerId.userId, cuid)).set(chat)
+                .addOnSuccessListener {
+                    cont.resumeWith(Result.success(true))
+                }
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                }
+        }
+    }
 }

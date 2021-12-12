@@ -1,22 +1,20 @@
 package com.example.chatapp.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
-import com.example.chatapp.adapter.ChatAdapter
 import com.example.chatapp.adapter.GroupChatAdapter
 import com.example.chatapp.util.Constants
 import com.example.chatapp.viewmodel.GroupChatViewModel
 import com.example.chatapp.viewmodel.GroupChatViewModelFactory
 import com.example.chatapp.wrapper.GroupChat
-import com.example.chatapp.wrapper.User
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 

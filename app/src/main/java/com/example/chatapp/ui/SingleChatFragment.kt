@@ -2,22 +2,23 @@ package com.example.chatapp.ui
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.adapter.ChatAdapter
 import com.example.chatapp.util.Constants
-import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.viewmodel.SingleChatViewModel
 import com.example.chatapp.viewmodel.SingleChatViewModelFactory
+import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.User
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class SingleChatFragment : Fragment() {
@@ -28,7 +29,7 @@ class SingleChatFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     var chatFragmentHostListener: ChatFragmentHostListener? = null
 
-    var userList = mutableListOf<User>()
+    var userList = mutableListOf<ChatUser?>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -60,8 +61,17 @@ class SingleChatFragment : Fragment() {
                 }
             }
         })
-        singleChatViewModel.getAllUsers()
-        singleChatViewModel.readUsersFromDb.observe(viewLifecycleOwner) {
+        view.findViewById<FloatingActionButton>(R.id.newChatButton).setOnClickListener {
+            activity?.run {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.flFragment, NewChatFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+        singleChatViewModel.getChatsFromDB(1)
+        singleChatViewModel.userchatsFromDb.observe(viewLifecycleOwner) {
             Log.d("checkback", "entered")
             userList.clear()
             userList.addAll(it)

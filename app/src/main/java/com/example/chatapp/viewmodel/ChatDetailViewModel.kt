@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.service.FirebaseStorageService
+import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.Message
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -23,6 +24,9 @@ class ChatDetailViewModel: ViewModel() {
 
     private val _imageUploadedStatus = MutableLiveData<Uri?>()
     val imageUploadedStatus = _imageUploadedStatus as LiveData<Uri?>
+
+    private val _chatCreatedStatus = MutableLiveData<Boolean>()
+    val chatCreatedStatus = _chatCreatedStatus as LiveData<Boolean>
 
     fun getChatsFromDB(peerid: String, limit: Long) {
         viewModelScope.launch {
@@ -98,6 +102,17 @@ class ChatDetailViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 _imageUploadedStatus.value = FirebaseStorageService.uploadImage(selectedImagePath)
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    fun addNewUserChat(peerId: ChatUser) {
+        viewModelScope.launch {
+            try {
+                _chatCreatedStatus.value = FirebaseDatabaseService.addNewUserChat(peerId)
             }
             catch (ex: Exception) {
                 ex.printStackTrace()

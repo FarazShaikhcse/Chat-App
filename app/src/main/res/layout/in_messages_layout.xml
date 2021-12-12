@@ -63,12 +63,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rec_img_layout"
         android:layout_width="0dp"
+        android:layout_margin="2dp"
         android:layout_height="wrap_content"
         android:background="@drawable/rec_msg_bg"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        android:visibility="gone"
+
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@id/guidelineV1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
