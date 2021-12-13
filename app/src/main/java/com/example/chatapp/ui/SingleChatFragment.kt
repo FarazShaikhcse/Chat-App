@@ -17,7 +17,6 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.viewmodel.SingleChatViewModel
 import com.example.chatapp.viewmodel.SingleChatViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
-import com.example.chatapp.wrapper.User
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 

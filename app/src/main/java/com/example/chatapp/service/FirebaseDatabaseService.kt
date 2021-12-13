@@ -3,10 +3,14 @@ package com.example.chatapp.service
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.annotation.LongDef
 import androidx.annotation.RequiresApi
 import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
-import com.example.chatapp.wrapper.*
+import com.example.chatapp.wrapper.ChatUser
+import com.example.chatapp.wrapper.GroupChat
+import com.example.chatapp.wrapper.Message
+import com.example.chatapp.wrapper.User
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -40,7 +44,7 @@ object FirebaseDatabaseService {
                         val user = User(
                             it.get(Constants.USERNAME).toString(),
                             it.get(Constants.ABOUT).toString(), it.get(Constants.USERID).toString(),
-                            it.get(Constants.PFP_URI).toString()
+                            it.get(Constants.PFP_URI).toString(), it.get(Constants.TOKEN).toString()
                         )
                         cont.resumeWith(Result.success(user))
                     }
@@ -372,41 +376,46 @@ object FirebaseDatabaseService {
             var userList: List<ChatUser> = emptyList()
             AuthenticationService.getUserID()?.let { recid ->
                 Log.d("userid", recid)
-                var peername = ""
-                var pfpUri = ""
-                var peerid = ""
+
                 var userDoc: DocumentSnapshot? = null
                 val requests = ArrayList<Deferred<ChatUser>>()
+                val userDetailsRequest = ArrayList<Deferred<User>>()
                 db.collection(Constants.CHATS)
                     .whereArrayContains(Constants.PARTICIPANTS, recid)
                     .get().addOnSuccessListener {
                         CoroutineScope(Dispatchers.IO).launch {
-                            var chatUser: ChatUser? = null
                             for (doc in it) {
-                                val participants =
-                                    doc.get(Constants.PARTICIPANTS) as ArrayList<String>
-                                val names =
-                                    doc.get(Constants.PARTICIPANTS_NAME) as ArrayList<String>
-                                val pfps = doc.get(Constants.PARTICIPANTS_PFP) as ArrayList<String>
-                                if (participants[0] == SharedPref.get(Constants.USERID)) {
-                                    peerid = participants[1]
-                                    peername = names[1]
-                                    pfpUri = pfps[1]
-                                } else {
-                                    peerid = participants[0]
-                                    peername = names[0]
-                                    pfpUri = pfps[0]
-                                }
-                                delay(500)
+                                userDetailsRequest.add(async {
+                                    var peerid = ""
+                                    val participants =
+                                        doc.get(Constants.PARTICIPANTS) as ArrayList<String>
+                                    if (participants[0] == SharedPref.get(Constants.USERID)) {
+                                        peerid = participants[1]
+                                    } else {
+                                        peerid = participants[0]
+                                    }
+                                    val fetchUserRequest = ArrayList<Deferred<User>>()
+                                    fetchUserRequest.add(async {
+                                        getUserDetails(peerid)
+                                    }
+                                    )
+                                    val user = fetchUserRequest.awaitAll()
+                                    return@async user[0]
+
+                                })
+                                val user = userDetailsRequest.awaitAll()
+//                                delay(250)
                                 requests.add(async {
                                     getMessages(
-                                        peerid,
-                                        peername,
-                                        pfpUri,
+                                        user[0].userId,
+                                        user[0].userName,
+                                        user[0].pfpUri,
+                                        user[0].msgToken,
                                         limit,
                                         doc
                                     )
                                 })
+                                userDetailsRequest.clear()
                             }
                             val chats = requests.awaitAll()
                             cont.resumeWith(Result.success(chats.toMutableList()))
@@ -422,10 +431,34 @@ object FirebaseDatabaseService {
         }
     }
 
+    private suspend fun getUserDetails(peerid: String): User {
+        return suspendCoroutine { cont ->
+            FirebaseFirestore.getInstance().collection(Constants.USERS).document(peerid).get()
+                .addOnSuccessListener {
+                    val peername = it.get(Constants.USERNAME) as String
+                    val pfpUri = it.get(Constants.PFP_URI) as String
+                    val msgToken = it.get(Constants.TOKEN) as String
+                    cont.resumeWith(
+                        Result.success(
+                            User(
+                                peername,
+                                userId = peerid,
+                                pfpUri = pfpUri,
+                                msgToken = msgToken
+                            )
+                        )
+                    )
+                }
+
+        }
+    }
+
+
     suspend fun getMessages(
         peerid: String,
         peername: String,
         pfpUri: String,
+        msgToken: String,
         limit: Long,
         doc: QueryDocumentSnapshot
     ) =
@@ -443,7 +476,8 @@ object FirebaseDatabaseService {
                             peerid,
                             msg.get(Constants.TEXT) as String,
                             msg.get(Constants.SENT_TIME) as Long,
-                            pfpUri
+                            pfpUri,
+                            msgToken = msgToken
                         )
                     }
                     cont.resumeWith(Result.success(chatUser))
@@ -455,25 +489,31 @@ object FirebaseDatabaseService {
 
     suspend fun getChatUsersFromDb(): ArrayList<User>? {
         return suspendCoroutine { cont ->
-            val userList = ArrayList<User>()
+            var userList = ArrayList<User>()
             val db = FirebaseFirestore.getInstance()
             val cuid = SharedPref.get(Constants.USERID).toString()
+            val chatDetailsRequest = ArrayList<Deferred<User?>>()
             db.collection(Constants.USERS)
                 .whereNotEqualTo(Constants.USERID, cuid)
                 .get().addOnSuccessListener {
                     CoroutineScope(Dispatchers.IO).launch {
                         for (doc in it) {
                             delay(100)
-                            if (!checkIfChatExists(cuid, doc.get(Constants.USERID) as String))
-                                userList.add(
-                                    User(
+                            chatDetailsRequest.add(async {
+                                if (!checkIfChatExists(cuid, doc.get(Constants.USERID) as String)) {
+                                    val user = User(
                                         doc.get(Constants.USERNAME) as String,
                                         doc.get(Constants.ABOUT) as String,
                                         doc.get(Constants.USERID) as String,
-                                        doc.get(Constants.PFP_URI) as String
+                                        doc.get(Constants.PFP_URI) as String,
+                                        doc.get(Constants.TOKEN) as String
                                     )
-                                )
+                                    return@async user
+                                } else
+                                    return@async null
+                            })
                         }
+                        userList = chatDetailsRequest.awaitAll().filterNotNull() as ArrayList<User>
                         Log.d("selectChatuser", userList.size.toString())
                         cont.resumeWith(Result.success(userList))
                     }
@@ -508,9 +548,7 @@ object FirebaseDatabaseService {
         val cuid_name = SharedPref.get(Constants.USERNAME).toString()
         return suspendCoroutine { cont ->
             val chat = hashMapOf(
-                Constants.PARTICIPANTS to listOf<String>(cuid, peerId.userId),
-                Constants.PARTICIPANTS_PFP to listOf<String>(cuid_pfp, peerId.pfpUri),
-                Constants.PARTICIPANTS_NAME to listOf<String>(cuid_name, peerId.userName)
+                Constants.PARTICIPANTS to listOf<String>(cuid, peerId.userId)
             )
             db.collection(Constants.CHATS).document(getChatDocid(peerId.userId, cuid)).set(chat)
                 .addOnSuccessListener {
@@ -518,6 +556,53 @@ object FirebaseDatabaseService {
                 }
                 .addOnFailureListener {
                     cont.resumeWith(Result.failure(it))
+                }
+        }
+    }
+
+    suspend fun updateTokentoDB(token: String) {
+        val db = FirebaseFirestore.getInstance()
+        val cuid = SharedPref.get(Constants.USERID).toString()
+        return suspendCoroutine { cont ->
+            val chat = hashMapOf(
+                Constants.TOKEN to token
+            )
+            db.collection(Constants.USERS).document(cuid).update(chat as Map<String, Any>)
+                .addOnFailureListener {
+                    cont.resumeWith(Result.failure(it))
+                }
+        }
+    }
+
+    suspend fun getTokensOfMembers(participants: java.util.ArrayList<String>): List<String>? {
+
+        return suspendCoroutine { cont ->
+
+            val request = ArrayList<Deferred<String>>()
+            CoroutineScope(Dispatchers.IO).launch {
+            for (user in participants) {
+                if ( user != SharedPref.get(Constants.USERID)) {
+                    request.add(async {
+                        getToken(user)
+                    })
+                }
+                }
+                val list = request.awaitAll()
+                Log.d("tokenlist", list.size.toString() + "ele")
+                cont.resumeWith(Result.success(list))
+            }
+
+        }
+    }
+
+    private suspend fun getToken(user: String): String{
+        val db = FirebaseFirestore.getInstance()
+        return suspendCoroutine { continuation ->
+            db.collection(Constants.USERS).document(user).get().addOnSuccessListener {
+                continuation.resumeWith(Result.success(it.get(Constants.TOKEN) as String))
+            }
+                .addOnFailureListener {
+                    continuation.resumeWith(Result.failure(it))
                 }
         }
     }

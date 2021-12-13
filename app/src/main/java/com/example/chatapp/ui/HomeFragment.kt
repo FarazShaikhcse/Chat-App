@@ -13,14 +13,12 @@ import com.example.chatapp.R
 import com.example.chatapp.adapter.ChatAdapter
 import com.example.chatapp.adapter.ViewPagerAdapter
 import com.example.chatapp.viewmodel.SharedViewModel
-import com.example.chatapp.wrapper.Chat
 
 class HomeFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var adapter: ChatAdapter
     private lateinit var recyclerView: RecyclerView
-    var chatList = mutableListOf<Chat>()
     lateinit var viewPager: ViewPager
     private lateinit var tablayout: com.google.android.material.tabs.TabLayout
     override fun onCreateView(

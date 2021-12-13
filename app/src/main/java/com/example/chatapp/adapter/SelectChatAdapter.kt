@@ -18,8 +18,6 @@ class SelectChatAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<SelectChatAdapter.SelectChatUserViewHolder>() {
 
-    var selectedUserId = mutableListOf<String>()
-
     class SelectChatUserViewHolder(itemView: View, listener: OnItemClickListener) :
     RecyclerView.ViewHolder(itemView) {
         init {
@@ -34,12 +32,7 @@ class SelectChatAdapter(
     }
 
     private lateinit var mListner: OnItemClickListener
-    var userList: ArrayList<User> = ArrayList()
 
-    init {
-        userList = users as ArrayList<User>
-
-    }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         mListner = listener
@@ -61,21 +54,16 @@ class SelectChatAdapter(
 
 
         holder.itemView.apply {
-            userName.text = this@SelectChatAdapter.users[position].userName
-            about.text = this@SelectChatAdapter.users[position].about
-            if (this@SelectChatAdapter.users[position].pfpUri != "") {
-                Glide.with(context).load(Uri.parse(this@SelectChatAdapter.users[position].pfpUri)).dontAnimate()
+            userName.text = users[position].userName
+            about.text = users[position].about
+            if (users[position].pfpUri != "") {
+                Glide.with(context).load(Uri.parse(users[position].pfpUri)).dontAnimate()
                     .into(profileImage)
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return this.users.size
+        return users.size
     }
-
-    fun getSelectedUserIdList(): MutableList<String> {
-        return selectedUserId
-    }
-
 }

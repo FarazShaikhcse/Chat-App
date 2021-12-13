@@ -3,6 +3,10 @@ package com.example.chatapp.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.chatapp.service.FirebaseDatabaseService
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class SharedViewModel: ViewModel() {
 
@@ -53,6 +57,18 @@ class SharedViewModel: ViewModel() {
 
     fun setGotoSplashScreen(status: Boolean) {
         _gotoSplashPageStatus.value = status
+    }
+
+    fun updateToken(token: String) {
+        viewModelScope.launch {
+            try {
+                FirebaseDatabaseService.updateTokentoDB(token)
+            }
+         catch (ex: Exception) {
+             ex.printStackTrace()
+         }
+        }
+
     }
 
 }

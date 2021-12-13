@@ -15,7 +15,7 @@
         android:background="@color/dark">
 
         <ImageButton
-            android:id="@+id/user_list_back_button"
+            android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -33,23 +33,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="27dp"
-            android:layout_toEndOf="@+id/user_list_back_button"
+            android:layout_toEndOf="@+id/back_button"
             android:paddingTop="4dp"
             android:text="Select Chat"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@+id/user_list_back_button"
+            app:layout_constraintStart_toEndOf="@+id/back_button"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/user_list_recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraint_layout_user_list_toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/constraint_layout_user_list_toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

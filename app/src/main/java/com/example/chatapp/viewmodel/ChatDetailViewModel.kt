@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.chatapp.notification.NotificationService
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.service.FirebaseStorageService
+import com.example.chatapp.util.Constants
+import com.example.chatapp.util.SharedPref
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.Message
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +31,9 @@ class ChatDetailViewModel: ViewModel() {
     private val _chatCreatedStatus = MutableLiveData<Boolean>()
     val chatCreatedStatus = _chatCreatedStatus as LiveData<Boolean>
 
+    private val _groupMembersTokens = MutableLiveData<List<String>>()
+    val groupMembersTokens = _groupMembersTokens as LiveData<List<String>>
+
     fun getChatsFromDB(peerid: String, limit: Long) {
         viewModelScope.launch {
             try {
@@ -39,7 +45,7 @@ class ChatDetailViewModel: ViewModel() {
         }
     }
 
-    fun sendMsgToUser(text: String, peerid: String, msgType: String) {
+    fun sendMsgToUser(text: String, peerid: String, msgType: String, msgToken: String) {
         viewModelScope.launch {
             try {
                 _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
@@ -48,6 +54,14 @@ class ChatDetailViewModel: ViewModel() {
                         peerid, text, msgType
                     )
                 }
+                val imagePattern = Regex("^https://firebasestorage.googleapis.com")
+                if (imagePattern.containsMatchIn(text) )
+                    NotificationService.pushNotification(msgToken, SharedPref.get(Constants.USERNAME).toString(),
+                        "Sent Image")
+                else
+                    NotificationService.pushNotification(msgToken, SharedPref.get(Constants.USERNAME).toString(),
+                        text)
+
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
@@ -78,6 +92,7 @@ class ChatDetailViewModel: ViewModel() {
                 FirebaseDatabaseService.getUpdatedGroupChatsFromDb(groupId).collect{
                     _userchatsFromDb.value = it
             }
+
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
@@ -85,11 +100,31 @@ class ChatDetailViewModel: ViewModel() {
         }
     }
 
-    fun sendMsgToGroup(groupId: String, message: String, msgType: String) {
+    fun getToken(participants: ArrayList<String>) {
+        viewModelScope.launch {
+            try {
+                _groupMembersTokens.value =  FirebaseDatabaseService.getTokensOfMembers(participants)
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    fun sendMsgToGroup(groupId: String, message: String, msgType: String, tokenList: List<String>) {
         viewModelScope.launch {
             try {
                 _messageSentStatus.value = AuthenticationService.getUserID()?.let { sender ->
                     FirebaseDatabaseService.sendTextToGroupDb(sender, groupId, message, msgType)
+                }
+                val imagePattern = Regex("^https://firebasestorage.googleapis.com")
+                var text = message
+                if (imagePattern.containsMatchIn(message)) {
+                     text = "Sent Image"
+                }
+                for (token in tokenList) {
+                        NotificationService.pushNotification(token, SharedPref.get(Constants.USERNAME).toString(),
+                            text)
                 }
             }
             catch (ex: Exception) {

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
+import com.example.chatapp.notification.FirebaseMessagingSv
 import com.example.chatapp.service.AuthenticationService
 import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
@@ -36,6 +37,9 @@ class SplashScreenFragment : Fragment() {
         logo.animate().setDuration(1500).alpha(1f).withEndAction {
             if (FirebaseAuth.getInstance().currentUser != null) {
                 AuthenticationService.getUserID()?.let { SharedPref.addString(Constants.USERID, it) }
+                FirebaseMessagingSv().getToken {
+                    sharedViewModel.updateToken(it)
+                }
                 sharedViewModel.setGotoHomePageStatus(true)
             }
             else {

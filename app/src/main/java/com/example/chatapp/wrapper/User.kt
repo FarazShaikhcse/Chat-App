@@ -2,4 +2,5 @@ package com.example.chatapp.wrapper
 
 import java.io.Serializable
 
-data class User(val userName: String, val about: String, val userId: String, var pfpUri: String = ""): Serializable {}
+data class User(val userName: String, val about: String = "", val userId: String,
+                var pfpUri: String = "", var msgToken: String = ""): Serializable {}

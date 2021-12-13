@@ -27,7 +27,7 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
-import com.example.chatapp.wrapper.User
+import java.util.function.LongFunction
 
 
 class ChatDetailsFragment : Fragment() {
@@ -38,6 +38,7 @@ class ChatDetailsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bundle: Bundle
     private lateinit var adapter: CustomAdapter
+    var tokenList = emptyList<String>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,7 +55,6 @@ class ChatDetailsFragment : Fragment() {
         binding = FragmentChatDetailsBinding.inflate(layoutInflater)
         val view = binding.root
         recyclerView = binding.chatsRV
-//        SharedPref.get(Constants.USERID)?.let { chatDetailViewModel.getChatsFromDB(it, 999) }
         bundle = requireArguments()
         bundle.getString(Constants.CHAT_TYPE)?.let { SharedPref.addString(Constants.CHAT_TYPE, it) }
         if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
@@ -71,6 +71,7 @@ class ChatDetailsFragment : Fragment() {
         } else if (bundle.getString(Constants.CHAT_TYPE) == Constants.GROUPS) {
             val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
             chatDetailViewModel.getGroupMessages(selectedChat.groupId)
+            chatDetailViewModel.getToken(selectedChat.participants)
             binding.usernameTV.text = selectedChat.groupName
             if (selectedChat.pfpUri != "") {
                 context?.let {
@@ -98,7 +99,6 @@ class ChatDetailsFragment : Fragment() {
             linearLayout.reverseLayout = true
             recyclerView.layoutManager = linearLayout
             recyclerView.adapter = adapter
-//            recyclerView.smoothScrollToPosition(adapter.itemCount - 1)
         }
         chatDetailViewModel.messageSentStatus.observe(viewLifecycleOwner) {
             binding.msgeditText.setText("")
@@ -107,11 +107,12 @@ class ChatDetailsFragment : Fragment() {
         chatDetailViewModel.imageUploadedStatus.observe(viewLifecycleOwner) {
             if (it != null) {
                 if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
-                    val selectedChat: User = bundle.getSerializable("clicked_chat") as User
+                    val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
                     chatDetailViewModel.sendMsgToUser(
                         it.toString(),
                         selectedChat.userId,
-                        Constants.IMAGE
+                        Constants.IMAGE,
+                        selectedChat.msgToken
                     )
                 } else {
                     val selectedChat: GroupChat =
@@ -119,7 +120,8 @@ class ChatDetailsFragment : Fragment() {
                     chatDetailViewModel.sendMsgToGroup(
                         selectedChat.groupId,
                         it.toString(),
-                        Constants.IMAGE
+                        Constants.IMAGE,
+                        tokenList
                     )
                 }
             }
@@ -128,6 +130,10 @@ class ChatDetailsFragment : Fragment() {
             if (it) {
                 Log.d("chatregisterstatus", it.toString())
             }
+        }
+        chatDetailViewModel.groupMembersTokens.observe(viewLifecycleOwner) {
+            tokenList = it
+            Log.d("TokenList", "size of list" + it.size.toString())
         }
     }
 
@@ -143,10 +149,11 @@ class ChatDetailsFragment : Fragment() {
 
             if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
                 val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
-                chatDetailViewModel.sendMsgToUser(text, selectedChat.userId, Constants.TEXT)
+                chatDetailViewModel.sendMsgToUser(text, selectedChat.userId,
+                    Constants.TEXT, selectedChat.msgToken)
             } else {
                 val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
-                chatDetailViewModel.sendMsgToGroup(selectedChat.groupId, text, Constants.TEXT)
+                chatDetailViewModel.sendMsgToGroup(selectedChat.groupId, text, Constants.TEXT, tokenList)
             }
         }
         binding.sendImageBtn.setOnClickListener {

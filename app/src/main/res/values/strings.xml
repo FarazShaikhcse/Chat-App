@@ -6,7 +6,7 @@
     <string name="send">Send</string>
     <string name="read_our_pr">Read our Privacy Policy. Tap "Agree &amp; Continue" to accept the Terms of Service.
 </string>
-    <string name="frome_faraz">from\nFARAZ</string>
+    <string name="from_faraz">from\nFARAZ</string>
     <string name="enter_sms_c">Enter SMS code</string>
     <string name="countrycode">+91</string>
     <string name="Done">Done</string>
@@ -20,6 +20,4 @@
     <string name="save">Save</string>
     <string name="TypeaMessage">Type a message</string>
     <string name="create_group">Create Group</string>
-
-
 </resources>
