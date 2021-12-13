@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.wrapper.GroupChat
-import com.example.chatapp.wrapper.User
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 

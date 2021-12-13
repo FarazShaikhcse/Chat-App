@@ -12,7 +12,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#232D36"
+        android:background="@color/dark"
         app:tabTextAppearance="@style/MineCustomTabText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,7 @@
         app:tabIconTint="@color/teal_200"
         app:tabIndicatorColor="@color/teal_200"
         app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="#9DA5AC">
+        app:tabTextColor="@color/tab_text_color">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

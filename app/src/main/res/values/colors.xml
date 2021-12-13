@@ -12,4 +12,7 @@
     <color name="sent_msg_color">#007f6e</color>
     <color name="chat_color">#18252D</color>
     <color name="chats_bg">#101D25</color>
+    <color name="msg_time_color">#b3b3b3</color>
+    <color name="send_button_color">#1EBE71</color>
+    <color name="tab_text_color">#9DA5AC</color>
 </resources>

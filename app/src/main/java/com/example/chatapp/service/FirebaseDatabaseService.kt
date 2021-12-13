@@ -3,7 +3,6 @@ package com.example.chatapp.service
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import androidx.annotation.LongDef
 import androidx.annotation.RequiresApi
 import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
@@ -119,6 +118,7 @@ object FirebaseDatabaseService {
             msgType,
             senderName = SharedPref.get(Constants.USERNAME).toString()
         )
+        Log.d("sendmessagedb", "called")
         val db = FirebaseFirestore.getInstance()
         return suspendCoroutine { callback ->
             db.collection(Constants.CHATS).document(chatId).collection(Constants.MESSAGES)
@@ -140,31 +140,35 @@ object FirebaseDatabaseService {
         return callbackFlow {
             val chatId = getChatDocid(senderId, receiverId)
             val db = FirebaseFirestore.getInstance()
+            val msgList = ArrayList<Message>()
             val ref = db.collection(Constants.CHATS).document(chatId)
                 .collection(Constants.MESSAGES)
                 .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
-                .addSnapshotListener { value, error ->
+                .addSnapshotListener { snapshot, error ->
                     if (error != null) {
                         this.trySend(null).isFailure
                         error.printStackTrace()
                     } else {
-                        if (value != null) {
-                            val messageList = arrayListOf<Message>()
-                            for (item in value.documents) {
-                                val data = item.data as HashMap<*, *>
-                                val message = Message(
-                                    senderId = data[Constants.SENDERID].toString(),
-                                    sentTime = data[Constants.SENT_TIME] as Long,
-                                    text = data[Constants.TEXT].toString(),
-                                    messageType = data[Constants.MESSAGE_TYPE].toString(),
-                                    senderName = data[Constants.SENDER_NAME].toString()
-                                )
-                                messageList.add(message)
+                        if (snapshot != null) {
+                            for (doc in snapshot.documentChanges) {
+                                if (doc.type == DocumentChange.Type.ADDED) {
+                                    val item = doc.document
+                                    val msg = Message(
+                                        item.get(Constants.SENDERID).toString(),
+                                        item.get(Constants.SENT_TIME) as Long,
+                                        item.get(Constants.TEXT).toString(),
+                                        item.get(Constants.MESSAGE_TYPE).toString(),
+                                        item.get(Constants.SENDER_NAME) as String
+                                    )
+                                    msgList.add(msg)
+                                }
                             }
-                            this.trySend(messageList).isSuccess
                         }
+                        Log.d("messageList", msgList.size.toString())
+                        this.trySend(msgList).isSuccess
                     }
                 }
+
             awaitClose() {
                 ref.remove()
             }
@@ -580,12 +584,12 @@ object FirebaseDatabaseService {
 
             val request = ArrayList<Deferred<String>>()
             CoroutineScope(Dispatchers.IO).launch {
-            for (user in participants) {
-                if ( user != SharedPref.get(Constants.USERID)) {
-                    request.add(async {
-                        getToken(user)
-                    })
-                }
+                for (user in participants) {
+                    if (user != SharedPref.get(Constants.USERID)) {
+                        request.add(async {
+                            getToken(user)
+                        })
+                    }
                 }
                 val list = request.awaitAll()
                 Log.d("tokenlist", list.size.toString() + "ele")
@@ -595,7 +599,7 @@ object FirebaseDatabaseService {
         }
     }
 
-    private suspend fun getToken(user: String): String{
+    private suspend fun getToken(user: String): String {
         val db = FirebaseFirestore.getInstance()
         return suspendCoroutine { continuation ->
             db.collection(Constants.USERS).document(user).get().addOnSuccessListener {
@@ -604,6 +608,209 @@ object FirebaseDatabaseService {
                 .addOnFailureListener {
                     continuation.resumeWith(Result.failure(it))
                 }
+        }
+    }
+
+    suspend fun loadNextChats(receiver: String?, offset: Long): MutableList<Message> {
+        return suspendCoroutine { cont ->
+            val sender = SharedPref.get(Constants.USERID).toString()
+            val list = mutableListOf<Message>()
+            if (offset != 0L && sender != null && receiver != null) {
+                Log.d("pagination", "offset $offset")
+                val documentKey = getChatDocid(receiver, sender)
+                FirebaseFirestore.getInstance().collection(Constants.CHATS)
+                    .document(documentKey)
+                    .collection(Constants.MESSAGES)
+                    .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
+                    .startAfter(offset)
+                    .limit(20)
+                    .get()
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            val querySnapshot = it.result
+                            if (querySnapshot != null) {
+                                for (i in querySnapshot.documents) {
+                                    val senderId =
+                                        i.get(Constants.SENDERID).toString()
+                                    val senttime =
+                                        i.get(Constants.SENT_TIME) as Long
+                                    val messagec =
+                                        i.get(Constants.TEXT).toString()
+                                    val messageType =
+                                        i.get(Constants.MESSAGE_TYPE)
+                                            .toString()
+                                    val senderName =
+                                        i.get(Constants.SENDER_NAME).toString()
+                                    val message = Message(
+                                        senderId,
+                                        senttime,
+                                        messagec,
+                                        messageType,
+                                        senderName
+                                    )
+                                    list.add(message)
+                                }
+                            }
+                            cont.resumeWith(Result.success(list))
+                        } else {
+                            Log.d("pagination", "failed")
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.d("pagination", "failed")
+                    }
+            }
+        }
+    }
+
+    suspend fun loadNextChatsGroups(groupId: String, offset: Long): MutableList<Message> {
+        return suspendCoroutine { cont ->
+            val list = mutableListOf<Message>()
+            if (offset != 0L && groupId != null) {
+                Log.d("pagination", "offset $offset")
+                FirebaseFirestore.getInstance().collection(Constants.GROUPS)
+                    .document(groupId)
+                    .collection(Constants.MESSAGES)
+                    .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
+                    .startAfter(offset)
+                    .limit(20)
+                    .get()
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            val querySnapshot = it.result
+                            if (querySnapshot != null) {
+                                for (i in querySnapshot.documents) {
+                                    val senderId =
+                                        i.get(Constants.SENDERID).toString()
+                                    val senttime =
+                                        i.get(Constants.SENT_TIME) as Long
+                                    val messagec =
+                                        i.get(Constants.TEXT).toString()
+
+                                    val messageType =
+                                        i.get(Constants.MESSAGE_TYPE)
+                                            .toString()
+                                    val senderName =
+                                        i.get(Constants.SENDER_NAME).toString()
+                                    val message = Message(
+                                        senderId,
+                                        senttime,
+                                        messagec,
+                                        messageType,
+                                        senderName
+                                    )
+                                    list.add(message)
+                                }
+                            }
+                            cont.resumeWith(Result.success(list))
+                        } else {
+                            Log.d("pagination", "failed")
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.d("pagination", "failed")
+                    }
+            }
+        }
+    }
+    @ExperimentalCoroutinesApi
+    fun getChatUpdates(receiver: String?): Flow<Message?> {
+        return callbackFlow<Message?> {
+            val sender = SharedPref.get(Constants.USERID)
+            if (sender != null && receiver != null) {
+                val getdocumentkey = getChatDocid(receiver, sender)
+                val ref = FirebaseFirestore.getInstance().collection(Constants.CHATS)
+                    .document(getdocumentkey)
+                    .collection(Constants.MESSAGES)
+                    .orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
+                    .limitToLast(15)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            cancel("error fetching collection data at path", error)
+                        }
+                        if (snapshot != null) {
+                            for (document in snapshot.documentChanges) {
+                                if (document.type == DocumentChange.Type.ADDED) {
+                                    Log.d("snapshot", "inside snapshot")
+                                    val senderid =
+                                        document.document.get(Constants.SENDERID)
+                                            .toString()
+                                    val sentTime =
+                                        document.document.get(Constants.SENT_TIME) as Long
+                                    val message =
+                                        document.document.get(Constants.TEXT).toString()
+                                    val senderName = document.document.get(Constants.SENDER_NAME)
+                                        .toString()
+                                    val messageType =
+                                        document.document.get(Constants.MESSAGE_TYPE)
+                                            .toString()
+                                    val chat = Message(
+                                        senderid,
+                                        sentTime,
+                                        message,
+                                        messageType,
+                                        senderName
+                                    )
+                                    Log.d("add", "fetching notes")
+                                    offer(chat)
+                                }
+                            }
+                        }
+                    }
+                awaitClose {
+                    ref.remove()
+                }
+
+            }
+        }
+    }
+
+    fun getGroupChatUpdates(groupId: String): Flow<Message?>  {
+        return callbackFlow<Message?> {
+            if (groupId != null) {
+                val ref = FirebaseFirestore.getInstance().collection(Constants.GROUPS)
+                    .document(groupId)
+                    .collection(Constants.MESSAGES)
+                    .orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
+                    .limitToLast(15)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            cancel("error fetching collection data at path", error)
+                        }
+                        if (snapshot != null) {
+                            for (document in snapshot.documentChanges) {
+                                if (document.type == DocumentChange.Type.ADDED) {
+                                    Log.d("snapshot", "inside snapshot")
+                                    val senderid =
+                                        document.document.get(Constants.SENDERID)
+                                            .toString()
+                                    val sentTime =
+                                        document.document.get(Constants.SENT_TIME) as Long
+                                    val message =
+                                        document.document.get(Constants.TEXT).toString()
+                                    val senderName = document.document.get(Constants.SENDER_NAME)
+                                        .toString()
+                                    val messageType =
+                                        document.document.get(Constants.MESSAGE_TYPE)
+                                            .toString()
+                                    val chat = Message(
+                                        senderid,
+                                        sentTime,
+                                        message,
+                                        messageType,
+                                        senderName
+                                    )
+                                    Log.d("add", "fetching notes")
+                                    offer(chat)
+                                }
+                            }
+                        }
+                    }
+                awaitClose {
+                    ref.remove()
+                }
+
+            }
         }
     }
 }

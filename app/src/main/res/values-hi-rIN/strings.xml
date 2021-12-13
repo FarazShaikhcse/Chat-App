@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_blank_fragment">ChatApp</string>
+    <string name="welcome_to_ChatApp">चैटएप में आपका स्वागत है</string>
+    <string name="about">बारे में</string>
+    <string name="add_participants">प्रतिभागियों को जोड़ें</string>
+    <string name="app_name">चैट ऐप</string>
+    <string name="chat">chats</string>
+    <string name="create_group">समूह बनाएं</string>
+    <string name="Done">पूर्ण</string>
+    <string name="enter_your_group_name">अपने समूह का नाम दर्ज करें..</string>
+    <string name="enter_sms_c">एसएमएस कोड दर्ज करें</string>
+    <string name="group_chat">समूह</string>
+    <string name="logout">" लॉग आउट"</string>
+    <string name="hi">" हे!"</string>
+    <string name="profile">प्रोफ़ाइल</string>
+    <string name="new_group">" नया समूह"</string>
+    <string name="read_our_pr">हमारी गोपनीयता नीति पढ़ें। सहमत और टैप करें सेवा की शर्तों को स्वीकार करना जारी रखें।</string>
+    <string name="save">सहेजें</string>
+    <string name="select_chat">" चैट का चयन करें"</string>
+    <string name="TypeaMessage">एक संदेश लिखें</string>
+    <string name="username">उपयोगकर्ता नाम</string>
+    <string name="usernameLabel">" उपयोगकर्ता नाम"</string>
+    <string name="send">भेजें</string>
+</resources>

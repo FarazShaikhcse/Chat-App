@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.wrapper.ChatUser
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlin.collections.ArrayList
 
 class ChatAdapter(
     var users: MutableList<ChatUser?>, val context: Context

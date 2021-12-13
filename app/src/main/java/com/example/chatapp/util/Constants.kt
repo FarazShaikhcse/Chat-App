@@ -1,6 +1,7 @@
 package com.example.chatapp.util
 
 object Constants {
+    const val IMAGE_URI = "img_uri"
     const val TOKEN = "msgToken"
     const val API_KEY = "key=AAAAdFWvm_s:APA91bHpYNrD-64Tof3Tepd275MqwK-toBYZnnDmPAXYwmU0ilxEbCcm_RDlIrkHlH78w0I01PBkTyGpvlwJKXObJ1E1F2D1aet3WvHMSA1VZ32nEf_QBlIOtU4E_Iy8ZBVTzH1u2_ok"
     const val PARTICIPANTS_NAME = "participant_name"

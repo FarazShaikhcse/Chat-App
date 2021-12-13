@@ -1,7 +1,6 @@
 package com.example.chatapp.ui
 
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -27,7 +26,6 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
-import java.util.function.LongFunction
 
 
 class ChatDetailsFragment : Fragment() {
@@ -38,7 +36,17 @@ class ChatDetailsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bundle: Bundle
     private lateinit var adapter: CustomAdapter
+    private var offset = Long.MAX_VALUE
+    var list = mutableListOf<Message>()
+    var isLoading = false
+    var currentItem: Int = 0
+    var totalItem: Int = 0
+    var scrolledOutItems: Int = 0
+    var messagesDocid = ""
+    var convType = ""
+
     var tokenList = emptyList<String>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,10 +63,17 @@ class ChatDetailsFragment : Fragment() {
         binding = FragmentChatDetailsBinding.inflate(layoutInflater)
         val view = binding.root
         recyclerView = binding.chatsRV
+        adapter = CustomAdapter(requireContext(), list as ArrayList<Message>)
+        val linearLayout = LinearLayoutManager(requireContext())
+        linearLayout.reverseLayout = true
+        recyclerView.layoutManager = linearLayout
+        recyclerView.adapter = adapter
         bundle = requireArguments()
         bundle.getString(Constants.CHAT_TYPE)?.let { SharedPref.addString(Constants.CHAT_TYPE, it) }
         if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
             val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
+            messagesDocid = selectedChat.userId
+            convType = Constants.CHATS
             chatDetailViewModel.updateMessages(selectedChat.userId)
             binding.usernameTV.text = selectedChat.userName
             if (selectedChat.pfpUri != "") {
@@ -70,6 +85,8 @@ class ChatDetailsFragment : Fragment() {
             }
         } else if (bundle.getString(Constants.CHAT_TYPE) == Constants.GROUPS) {
             val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
+            convType = Constants.GROUPS
+            messagesDocid = selectedChat.groupId
             chatDetailViewModel.getGroupMessages(selectedChat.groupId)
             chatDetailViewModel.getToken(selectedChat.participants)
             binding.usernameTV.text = selectedChat.groupName
@@ -87,45 +104,44 @@ class ChatDetailsFragment : Fragment() {
         }
         observeData()
         clickListeners()
+        recyclerViewScrollListener()
         return view
     }
 
     private fun observeData() {
 
         chatDetailViewModel.userchatsFromDb.observe(viewLifecycleOwner) {
-            val messageList = it
-            adapter = CustomAdapter(requireContext(), messageList as ArrayList<Message>)
-            val linearLayout = LinearLayoutManager(requireContext())
-            linearLayout.reverseLayout = true
-            recyclerView.layoutManager = linearLayout
-            recyclerView.adapter = adapter
+            isLoading = false
+            Log.d("pagination", it.size.toString())
+            if (it.size != 0) {
+                for (i in it) {
+                    Log.d("pagination", i.toString())
+                    offset = i.sentTime
+                    list.add(i)
+                    adapter.notifyItemInserted(list.size - 1)
+                }
+            } else {
+                offset = 0L
+            }
+        }
+        chatDetailViewModel.groupuserchatsFromDb.observe(viewLifecycleOwner) {
+            isLoading = false
+            Log.d("pagination", it.size.toString())
+            if (it.size != 0) {
+                for (i in it) {
+                    Log.d("pagination", i.toString())
+                    offset = i.sentTime
+                    list.add(i)
+                    adapter.notifyItemInserted(list.size - 1)
+                }
+            } else {
+                offset = 0L
+            }
         }
         chatDetailViewModel.messageSentStatus.observe(viewLifecycleOwner) {
             binding.msgeditText.setText("")
         }
 
-        chatDetailViewModel.imageUploadedStatus.observe(viewLifecycleOwner) {
-            if (it != null) {
-                if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
-                    val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
-                    chatDetailViewModel.sendMsgToUser(
-                        it.toString(),
-                        selectedChat.userId,
-                        Constants.IMAGE,
-                        selectedChat.msgToken
-                    )
-                } else {
-                    val selectedChat: GroupChat =
-                        bundle.getSerializable("clicked_chat") as GroupChat
-                    chatDetailViewModel.sendMsgToGroup(
-                        selectedChat.groupId,
-                        it.toString(),
-                        Constants.IMAGE,
-                        tokenList
-                    )
-                }
-            }
-        }
         chatDetailViewModel.chatCreatedStatus.observe(viewLifecycleOwner) {
             if (it) {
                 Log.d("chatregisterstatus", it.toString())
@@ -135,25 +151,49 @@ class ChatDetailsFragment : Fragment() {
             tokenList = it
             Log.d("TokenList", "size of list" + it.size.toString())
         }
+        chatDetailViewModel.newChatsFromDb.observe(viewLifecycleOwner) {
+            val msg = it
+            Log.d("newchatupdate", "called")
+            if (msg != null) {
+                list.add(0, msg)
+                adapter.notifyItemInserted(0)
+                recyclerView.smoothScrollToPosition(0)
+                offset = list[list.size - 1].sentTime
+            }
+
+        }
+        chatDetailViewModel.newGroupChatsFromDb.observe(viewLifecycleOwner) {
+            val msg = it
+            if (msg != null) {
+                list.add(0, msg)
+                adapter.notifyItemInserted(0)
+                recyclerView.smoothScrollToPosition(0)
+                offset = list[list.size - 1].sentTime
+            }
+        }
     }
 
     private fun clickListeners() {
         binding.backButton.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction().apply {
-                replace(R.id.flFragment, HomeFragment())
-                commit()
-            }
+            requireActivity().supportFragmentManager.popBackStack()
         }
         binding.sendMsgBtn.setOnClickListener {
             val text = binding.msgeditText.text.toString()
-
+            Log.d("Sendmessagecalled", "inside")
             if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
                 val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
-                chatDetailViewModel.sendMsgToUser(text, selectedChat.userId,
-                    Constants.TEXT, selectedChat.msgToken)
+                chatDetailViewModel.sendMsgToUser(
+                    text, selectedChat.userId,
+                    Constants.TEXT, selectedChat.msgToken
+                )
             } else {
                 val selectedChat: GroupChat = bundle.getSerializable("clicked_chat") as GroupChat
-                chatDetailViewModel.sendMsgToGroup(selectedChat.groupId, text, Constants.TEXT, tokenList)
+                chatDetailViewModel.sendMsgToGroup(
+                    selectedChat.groupId,
+                    text,
+                    Constants.TEXT,
+                    tokenList
+                )
             }
         }
         binding.sendImageBtn.setOnClickListener {
@@ -170,13 +210,53 @@ class ChatDetailsFragment : Fragment() {
         }
     }
 
+    private fun recyclerViewScrollListener() {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                currentItem = (recyclerView.layoutManager as LinearLayoutManager).childCount
+                totalItem = (recyclerView.layoutManager as LinearLayoutManager).itemCount
+                scrolledOutItems = (recyclerView.layoutManager as LinearLayoutManager)
+                    .findFirstVisibleItemPosition()
+                if (!isLoading) {
+                    if ((currentItem + scrolledOutItems) == totalItem && scrolledOutItems >= 0) {
+                        isLoading = true
+                        if (offset != 0L) {
+                            Log.d("pagination", "scrolled")
+                            loadNextTenChats()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun loadNextTenChats() {
+        Log.d("chatsloaded", "entered")
+        chatDetailViewModel.loadNextTenChats(messagesDocid, offset, convType)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("image", "Inside onActivityresult")
-        if (requestCode == Constants.RC_SELECT_IMAGE && resultCode == Activity.RESULT_OK
-            && data != null && data.data != null
-        ) {
-            val selectedImagePath = data.data
-            chatDetailViewModel.uploadImageToStorage(selectedImagePath)
+
+        val selectedImagePath = data?.data
+        val bundle1 = Bundle()
+        bundle1.putString(Constants.IMAGE_URI, selectedImagePath.toString())
+        bundle1.putString(Constants.CHAT_TYPE, bundle.getString(Constants.CHAT_TYPE))
+        bundle1.putStringArrayList(Constants.TOKEN, ArrayList(tokenList))
+        if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
+            val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
+            bundle1.putSerializable("chat", selectedChat)
+        } else {
+            val selectedChat: GroupChat =
+                bundle.getSerializable("clicked_chat") as GroupChat
+            bundle1.putSerializable("chat", selectedChat)
         }
+
+        val fragment = ImagePreviewFragment()
+        fragment.arguments = bundle1
+        requireActivity().supportFragmentManager.beginTransaction()
+            .add(R.id.flFragment, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

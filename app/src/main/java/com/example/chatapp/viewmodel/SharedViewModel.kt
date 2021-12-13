@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.service.FirebaseDatabaseService
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class SharedViewModel: ViewModel() {
 

@@ -29,7 +29,7 @@
             android:layout_marginTop="4dp"
             android:maxWidth="250dp"
             android:minWidth="120dp"
-            android:text="Username"
+            android:text="@string/username"
             android:textColor="@color/sent_msg_color"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:maxWidth="250dp"
             android:minWidth="120dp"
-            android:text="Hi"
+            android:text="@string/hi"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -52,11 +52,11 @@
             android:id="@+id/date_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#b3b3b3"
+            android:textColor="@color/msg_time_color"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/message_text"
-            tools:text="11:34" />
+            android:text="@string/demo_time" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -82,7 +82,7 @@
             android:layout_marginTop="4dp"
             android:maxWidth="250dp"
             android:minWidth="120dp"
-            android:text="Username"
+            android:text="@string/username"
             android:textColor="@color/sent_msg_color"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -102,7 +102,7 @@
             android:id="@+id/image_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#b3b3b3"
+            android:textColor="@color/msg_time_color"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_message"

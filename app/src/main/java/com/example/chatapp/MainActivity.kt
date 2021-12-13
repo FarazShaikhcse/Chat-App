@@ -1,21 +1,20 @@
 package com.example.chatapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.databinding.ActivityMainBinding
 import com.example.chatapp.ui.*
+import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
-import android.view.Menu
-import android.view.MenuItem
-import com.example.chatapp.service.AuthenticationService
-import com.example.chatapp.util.Constants
 import com.example.chatapp.viewmodel.UserDetailsViewModel
 import com.example.chatapp.viewmodel.UserDetailsViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity() {

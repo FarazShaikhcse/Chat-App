@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.adapter.ChatAdapter
+import com.example.chatapp.databinding.FragmentSingleChatBinding
 import com.example.chatapp.util.Constants
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
@@ -26,14 +27,13 @@ class SingleChatFragment : Fragment() {
     private lateinit var singleChatViewModel: SingleChatViewModel
     private lateinit var adapter: ChatAdapter
     private lateinit var recyclerView: RecyclerView
-    var chatFragmentHostListener: ChatFragmentHostListener? = null
+    private lateinit var binding: FragmentSingleChatBinding
 
     var userList = mutableListOf<ChatUser?>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_single_chat, container, false)
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory()
@@ -42,6 +42,9 @@ class SingleChatFragment : Fragment() {
             requireActivity(),
             SingleChatViewModelFactory()
         )[SingleChatViewModel::class.java]
+        binding = FragmentSingleChatBinding.inflate(layoutInflater)
+        val view = binding.root
+        binding.progressBar.visibility = View.VISIBLE
         adapter = ChatAdapter(userList, requireContext())
         recyclerView = view.findViewById(R.id.chatRV)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -69,17 +72,17 @@ class SingleChatFragment : Fragment() {
                     .commit()
             }
         }
-        singleChatViewModel.getChatsFromDB(1)
         singleChatViewModel.userchatsFromDb.observe(viewLifecycleOwner) {
             Log.d("checkback", "entered")
             userList.clear()
             userList.addAll(it)
             adapter.notifyDataSetChanged()
+            binding.progressBar.visibility = View.GONE
         }
         return view
     }
-
-    interface ChatFragmentHostListener {
-        fun onChatItemClicked(position: Int)
+    override fun onResume() {
+        super.onResume()
+        singleChatViewModel.getChatsFromDB(1)
     }
 }

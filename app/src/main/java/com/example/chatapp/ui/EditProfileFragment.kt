@@ -66,6 +66,9 @@ class EditProfileFragment : Fragment() {
         binding.profileImage.setOnClickListener {
             getImage.launch("image/*")
         }
+        binding.profileButton.setOnClickListener {
+            getImage.launch("image/*")
+        }
         binding.saveBtn.setOnClickListener {
             userDetailsViewModel.addUserDetails(
                 User(

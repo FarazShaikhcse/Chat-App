@@ -9,7 +9,6 @@ import com.example.chatapp.service.FirebaseDatabaseService
 import com.example.chatapp.service.FirebaseStorageService
 import com.example.chatapp.wrapper.User
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class UserDetailsViewModel: ViewModel() {
     private val _userDetailAddedStatus = MutableLiveData<Boolean>()

@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
-import com.example.chatapp.adapter.SelectChatAdapter
 import com.example.chatapp.adapter.UserListAdapter
 import com.example.chatapp.util.Constants
 import com.example.chatapp.viewmodel.CreateGroupViewModel

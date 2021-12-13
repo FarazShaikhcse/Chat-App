@@ -35,7 +35,7 @@
             android:layout_marginStart="27dp"
             android:layout_toEndOf="@+id/back_button"
             android:paddingTop="4dp"
-            android:text="Select Chat"
+            android:text="@string/select_chat"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/back_button"

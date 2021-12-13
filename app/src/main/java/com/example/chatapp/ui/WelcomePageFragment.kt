@@ -1,7 +1,6 @@
 package com.example.chatapp.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,28 +11,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapp.R
-import com.example.chatapp.util.SharedPref
+import com.example.chatapp.viewmodel.SendOTPViewModel
+import com.example.chatapp.viewmodel.SendOTPViewModelFactory
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import java.util.concurrent.TimeUnit
 
 class WelcomePageFragment : Fragment() {
-    // this stores the phone number of the user
+
     var number: String = ""
-
-    // create instance of firebase auth
-    lateinit var auth: FirebaseAuth
-
-    // we will use this to match the sent otp from firebase
-    lateinit var storedVerificationId: String
-    lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
-    private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var sendOTPViewModel: SendOTPViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,71 +32,28 @@ class WelcomePageFragment : Fragment() {
             requireActivity(),
             SharedViewModelFactory()
         )[SharedViewModel::class.java]
-        auth = FirebaseAuth.getInstance()
-
-        // start verification on click of the button
+        sendOTPViewModel = ViewModelProvider(
+            requireActivity(),
+            SendOTPViewModelFactory()
+        )[SendOTPViewModel::class.java]
         view.findViewById<Button>(R.id.submitBtn).setOnClickListener {
             login()
         }
-
-
-        // Callback function for Phone Auth
-        callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
-            // This method is called when the verification is completed
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                sharedViewModel.setGotoHomePageStatus(true)
-                Log.d("GFG", "onVerificationCompleted Success")
-            }
-
-            // Called when verification is failed add log statement to see the exception
-            override fun onVerificationFailed(e: FirebaseException) {
-                Log.d("GFG", "onVerificationFailed  $e")
-            }
-
-            // On code is sent by the firebase this method is called
-            // in here we start a new activity where user can enter the OTP
-            override fun onCodeSent(
-                verificationId: String,
-                token: PhoneAuthProvider.ForceResendingToken
-            ) {
-                Log.d("GFG", "onCodeSent: $verificationId")
-                storedVerificationId = verificationId
-                resendToken = token
-                SharedPref.addString("storedVerificationId", storedVerificationId)
+        sendOTPViewModel.otpSentStatus.observe(viewLifecycleOwner) {
+            if (it) {
                 sharedViewModel.setGoToOTPageStatus(true)
-
             }
         }
-    return view
-
+        return view
     }
-    fun login() {
-        number = view?.findViewById<EditText>(R.id.phoneNumber)?.text?.trim().toString()
 
-        // get the phone number from edit text and append the country cde with it
+    private fun login() {
+        number = view?.findViewById<EditText>(R.id.phoneNumber)?.text?.trim().toString()
         if (number.isNotEmpty()) {
             number = "+91$number"
-            sendVerificationCode(number)
+            sendOTPViewModel.sendVerificationCode(number, requireActivity())
         } else {
             Toast.makeText(requireContext(), "Enter mobile number", Toast.LENGTH_SHORT).show()
         }
     }
-
-    // this method sends the verification code
-    // and starts the callback of verification
-    // which is implemented above in onCreate
-    private fun sendVerificationCode(number: String) {
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(number) // Phone number to verify
-            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-            .setActivity(requireActivity()) // Activity (for callback binding)
-            .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-            .build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
-        Log.d("GFG" , "Auth started")
-    }
-
-
-
 }
