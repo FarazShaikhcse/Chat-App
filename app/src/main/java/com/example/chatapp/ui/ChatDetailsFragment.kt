@@ -29,9 +29,6 @@ import com.example.chatapp.wrapper.Message
 import androidx.fragment.app.FragmentActivity
 
 
-
-
-
 class ChatDetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentChatDetailsBinding
@@ -67,6 +64,7 @@ class ChatDetailsFragment : Fragment() {
         binding = FragmentChatDetailsBinding.inflate(layoutInflater)
         val view = binding.root
         recyclerView = binding.chatsRV
+        binding.paginationPB.visibility = View.GONE
         adapter = CustomAdapter(requireContext(), list as ArrayList<Message>)
         val linearLayout = LinearLayoutManager(requireContext())
         linearLayout.reverseLayout = true
@@ -116,6 +114,7 @@ class ChatDetailsFragment : Fragment() {
 
         chatDetailViewModel.userchatsFromDb.observe(viewLifecycleOwner) {
             isLoading = false
+            binding.paginationPB.visibility = View.GONE
             Log.d("pagination", it.size.toString())
             Log.d("inside single chat", "{$it}")
             if (it.size != 0) {
@@ -131,6 +130,7 @@ class ChatDetailsFragment : Fragment() {
         }
         chatDetailViewModel.groupuserchatsFromDb.observe(viewLifecycleOwner) {
             isLoading = false
+            binding.paginationPB.visibility = View.GONE
             Log.d("pagination", it.size.toString())
             Log.d("inside group chat", "{$it}")
             if (it.size != 0) {
@@ -161,21 +161,40 @@ class ChatDetailsFragment : Fragment() {
             val msg = it
             Log.d("inside new chat", "$it")
             if (msg != null) {
-                list.add(0, msg)
-                adapter.notifyItemInserted(0)
-                recyclerView.smoothScrollToPosition(0)
-                offset = list[list.size - 1].sentTime
+                if (adapter.itemCount >= 1) {
+                    if (list[0].sentTime != it.sentTime) {
+                        list.add(0, msg)
+                        adapter.notifyItemInserted(0)
+                        recyclerView.smoothScrollToPosition(0)
+                        offset = list[list.size - 1].sentTime
+                    }
+                } else if (adapter.itemCount == 0) {
+                    list.add(0, msg)
+                    adapter.notifyItemInserted(0)
+                    recyclerView.smoothScrollToPosition(0)
+                    offset = list[list.size - 1].sentTime
+                }
+
             }
 
         }
         chatDetailViewModel.newGroupChatsFromDb.observe(viewLifecycleOwner) {
             val msg = it
-            Log.d("inside group new chat", "$it")
             if (msg != null) {
-                list.add(0, msg)
-                adapter.notifyItemInserted(0)
-                recyclerView.smoothScrollToPosition(0)
-                offset = list[list.size - 1].sentTime
+                Log.d("inside group new chat", "$it")
+                if (adapter.itemCount >= 1) {
+                    if (list[0].sentTime != it.sentTime) {
+                        list.add(0, msg)
+                        adapter.notifyItemInserted(0)
+                        recyclerView.smoothScrollToPosition(0)
+                        offset = list[list.size - 1].sentTime
+                    }
+                } else if (adapter.itemCount == 0) {
+                    list.add(0, msg)
+                    adapter.notifyItemInserted(0)
+                    recyclerView.smoothScrollToPosition(0)
+                    offset = list[list.size - 1].sentTime
+                }
             }
         }
     }
@@ -246,6 +265,7 @@ class ChatDetailsFragment : Fragment() {
                 if (!isLoading) {
                     if ((currentItem + scrolledOutItems) == totalItem && scrolledOutItems >= 0) {
                         isLoading = true
+                        binding.paginationPB.visibility = View.VISIBLE
                         if (offset != 0L) {
                             Log.d("pagination", "scrolled")
                             loadNextTenChats()

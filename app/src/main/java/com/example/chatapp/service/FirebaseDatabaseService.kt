@@ -624,7 +624,7 @@ object FirebaseDatabaseService {
                     .collection(Constants.MESSAGES)
                     .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
                     .startAfter(offset)
-                    .limit(20)
+                    .limit(15)
                     .get()
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
@@ -674,7 +674,7 @@ object FirebaseDatabaseService {
                     .collection(Constants.MESSAGES)
                     .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
                     .startAfter(offset)
-                    .limit(20)
+                    .limit(15)
                     .get()
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
