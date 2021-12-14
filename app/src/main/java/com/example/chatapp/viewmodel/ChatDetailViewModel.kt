@@ -34,14 +34,15 @@ class ChatDetailViewModel : ViewModel() {
     private val _messageSentStatus = MutableLiveData<Boolean>()
     val messageSentStatus = _messageSentStatus as LiveData<Boolean>
 
-    private val _imageUploadedStatus = MutableLiveData<Uri?>()
-    val imageUploadedStatus = _imageUploadedStatus as LiveData<Uri?>
-
     private val _chatCreatedStatus = MutableLiveData<Boolean>()
     val chatCreatedStatus = _chatCreatedStatus as LiveData<Boolean>
 
     private val _groupMembersTokens = MutableLiveData<List<String>>()
     val groupMembersTokens = _groupMembersTokens as LiveData<List<String>>
+
+    init {
+        Log.d("view model", "initialised")
+    }
 
     fun getChatsFromDB(peerid: String, limit: Long) {
         viewModelScope.launch {
@@ -84,11 +85,9 @@ class ChatDetailViewModel : ViewModel() {
         viewModelScope.launch {
             AuthenticationService.getUserID()?.let { sender ->
                 try {
-//                    FirebaseDatabaseService.getUpdatedChatsFromDb(sender, peerid).collect{
-//                        _newChatsFromDb.value = it
-//                    }
                     FirebaseDatabaseService.getChatUpdates(peerid).collect {
-                        _newChatsFromDb.value = it
+                        if (it?.sentTime != _newGroupChatsFromDb.value?.sentTime)
+                            _newChatsFromDb.value = it
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -101,9 +100,6 @@ class ChatDetailViewModel : ViewModel() {
     fun getGroupMessages(groupId: String) {
         viewModelScope.launch {
             try {
-//                FirebaseDatabaseService.getUpdatedGroupChatsFromDb(groupId).collect{
-//                    _userchatsFromDb.value = it
-//            }
                 Log.d("groupmessageupdates", "called")
                 FirebaseDatabaseService.getGroupChatUpdates(groupId).collect {
                     _newGroupChatsFromDb.value = it
@@ -147,16 +143,6 @@ class ChatDetailViewModel : ViewModel() {
         }
     }
 
-    fun uploadImageToStorage(selectedImagePath: Uri?) {
-        viewModelScope.launch {
-            try {
-                _imageUploadedStatus.value = FirebaseStorageService.uploadImage(selectedImagePath)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
     fun addNewUserChat(peerId: ChatUser) {
         viewModelScope.launch {
             try {
@@ -180,6 +166,11 @@ class ChatDetailViewModel : ViewModel() {
                 ex.printStackTrace()
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.e("view model", "cleared")
     }
 
 }

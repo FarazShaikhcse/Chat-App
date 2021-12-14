@@ -15,6 +15,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.coroutines.suspendCoroutine
 import kotlin.streams.asSequence
 
@@ -408,7 +411,6 @@ object FirebaseDatabaseService {
 
                                 })
                                 val user = userDetailsRequest.awaitAll()
-//                                delay(250)
                                 requests.add(async {
                                     getMessages(
                                         user[0].userId,
@@ -422,6 +424,7 @@ object FirebaseDatabaseService {
                                 userDetailsRequest.clear()
                             }
                             val chats = requests.awaitAll()
+                            Collections.sort(chats) { o1, o2 -> (o2.recentMsgTime - o1.recentMsgTime).toInt() }
                             cont.resumeWith(Result.success(chats.toMutableList()))
                             Log.d("chatlist", chats.size.toString())
                         }
@@ -548,8 +551,6 @@ object FirebaseDatabaseService {
     suspend fun addNewUserChat(peerId: ChatUser): Boolean? {
         val db = FirebaseFirestore.getInstance()
         val cuid = SharedPref.get(Constants.USERID).toString()
-        val cuid_pfp = SharedPref.get(Constants.USER_PFP).toString()
-        val cuid_name = SharedPref.get(Constants.USERNAME).toString()
         return suspendCoroutine { cont ->
             val chat = hashMapOf(
                 Constants.PARTICIPANTS to listOf<String>(cuid, peerId.userId)
@@ -731,7 +732,7 @@ object FirebaseDatabaseService {
                         if (snapshot != null) {
                             for (document in snapshot.documentChanges) {
                                 if (document.type == DocumentChange.Type.ADDED) {
-                                    Log.d("snapshot", "inside snapshot")
+//                                    Log.d("snapshot", "inside snapshot")
                                     val senderid =
                                         document.document.get(Constants.SENDERID)
                                             .toString()
@@ -752,7 +753,7 @@ object FirebaseDatabaseService {
                                         senderName
                                     )
                                     Log.d("add", "fetching notes")
-                                    offer(chat)
+                                    trySend(chat).isSuccess
                                 }
                             }
                         }
@@ -767,50 +768,48 @@ object FirebaseDatabaseService {
 
     fun getGroupChatUpdates(groupId: String): Flow<Message?>  {
         return callbackFlow<Message?> {
-            if (groupId != null) {
-                val ref = FirebaseFirestore.getInstance().collection(Constants.GROUPS)
-                    .document(groupId)
-                    .collection(Constants.MESSAGES)
-                    .orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
-                    .limitToLast(15)
-                    .addSnapshotListener { snapshot, error ->
-                        if (error != null) {
-                            cancel("error fetching collection data at path", error)
-                        }
-                        if (snapshot != null) {
-                            for (document in snapshot.documentChanges) {
-                                if (document.type == DocumentChange.Type.ADDED) {
-                                    Log.d("snapshot", "inside snapshot")
-                                    val senderid =
-                                        document.document.get(Constants.SENDERID)
-                                            .toString()
-                                    val sentTime =
-                                        document.document.get(Constants.SENT_TIME) as Long
-                                    val message =
-                                        document.document.get(Constants.TEXT).toString()
-                                    val senderName = document.document.get(Constants.SENDER_NAME)
+            val ref = FirebaseFirestore.getInstance().collection(Constants.GROUPS)
+                .document(groupId)
+                .collection(Constants.MESSAGES)
+                .orderBy(Constants.SENT_TIME, Query.Direction.ASCENDING)
+                .limitToLast(15)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        cancel("error fetching collection data at path", error)
+                    }
+                    if (snapshot != null) {
+                        for (document in snapshot.documentChanges) {
+                            if (document.type == DocumentChange.Type.ADDED) {
+//                                    Log.d("snapshot", "inside snapshot")
+                                val senderid =
+                                    document.document.get(Constants.SENDERID)
                                         .toString()
-                                    val messageType =
-                                        document.document.get(Constants.MESSAGE_TYPE)
-                                            .toString()
-                                    val chat = Message(
-                                        senderid,
-                                        sentTime,
-                                        message,
-                                        messageType,
-                                        senderName
-                                    )
-                                    Log.d("add", "fetching notes")
-                                    offer(chat)
-                                }
+                                val sentTime =
+                                    document.document.get(Constants.SENT_TIME) as Long
+                                val message =
+                                    document.document.get(Constants.TEXT).toString()
+                                val senderName = document.document.get(Constants.SENDER_NAME)
+                                    .toString()
+                                val messageType =
+                                    document.document.get(Constants.MESSAGE_TYPE)
+                                        .toString()
+                                val chat = Message(
+                                    senderid,
+                                    sentTime,
+                                    message,
+                                    messageType,
+                                    senderName
+                                )
+                                Log.d("add", "fetching notes")
+                                trySend(chat).isSuccess
                             }
                         }
                     }
-                awaitClose {
-                    ref.remove()
                 }
-
+            awaitClose {
+                ref.remove()
             }
+
         }
     }
 }

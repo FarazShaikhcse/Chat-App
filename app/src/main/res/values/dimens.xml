@@ -6,4 +6,8 @@
     <dimen name="margin_med">18dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_large">32dp</dimen>
+    <dimen name="match_const">0dp</dimen>
+    <dimen name="usernametv_size">18sp</dimen>
+    <dimen name="chat_separator_height">1dp</dimen>
+    <dimen name="profile_pic_dim">50dp</dimen>
 </resources>

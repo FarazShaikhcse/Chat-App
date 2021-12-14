@@ -26,6 +26,10 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
+import androidx.fragment.app.FragmentActivity
+
+
+
 
 
 class ChatDetailsFragment : Fragment() {
@@ -113,6 +117,7 @@ class ChatDetailsFragment : Fragment() {
         chatDetailViewModel.userchatsFromDb.observe(viewLifecycleOwner) {
             isLoading = false
             Log.d("pagination", it.size.toString())
+            Log.d("inside single chat", "{$it}")
             if (it.size != 0) {
                 for (i in it) {
                     Log.d("pagination", i.toString())
@@ -127,6 +132,7 @@ class ChatDetailsFragment : Fragment() {
         chatDetailViewModel.groupuserchatsFromDb.observe(viewLifecycleOwner) {
             isLoading = false
             Log.d("pagination", it.size.toString())
+            Log.d("inside group chat", "{$it}")
             if (it.size != 0) {
                 for (i in it) {
                     Log.d("pagination", i.toString())
@@ -153,7 +159,7 @@ class ChatDetailsFragment : Fragment() {
         }
         chatDetailViewModel.newChatsFromDb.observe(viewLifecycleOwner) {
             val msg = it
-            Log.d("newchatupdate", "called")
+            Log.d("inside new chat", "$it")
             if (msg != null) {
                 list.add(0, msg)
                 adapter.notifyItemInserted(0)
@@ -164,6 +170,7 @@ class ChatDetailsFragment : Fragment() {
         }
         chatDetailViewModel.newGroupChatsFromDb.observe(viewLifecycleOwner) {
             val msg = it
+            Log.d("inside group new chat", "$it")
             if (msg != null) {
                 list.add(0, msg)
                 adapter.notifyItemInserted(0)
@@ -176,6 +183,24 @@ class ChatDetailsFragment : Fragment() {
     private fun clickListeners() {
         binding.backButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
+        }
+        binding.profileImage.setOnClickListener {
+            val newbundle = Bundle()
+            if (bundle.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
+                val selectedChat: ChatUser = bundle.getSerializable("clicked_chat") as ChatUser
+                newbundle.putSerializable("chat", selectedChat)
+            } else {
+                val selectedChat: GroupChat =
+                    bundle.getSerializable("clicked_chat") as GroupChat
+                newbundle.putSerializable("chat", selectedChat)
+            }
+            newbundle.putString(Constants.CHAT_TYPE, bundle.getString(Constants.CHAT_TYPE))
+            val fragment = ProfileScreenFragment()
+            fragment.arguments = newbundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .add(R.id.flFragment, fragment)
+                .addToBackStack(null)
+                .commit()
         }
         binding.sendMsgBtn.setOnClickListener {
             val text = binding.msgeditText.text.toString()

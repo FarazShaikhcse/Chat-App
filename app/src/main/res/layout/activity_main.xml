@@ -10,8 +10,8 @@
 
     <FrameLayout
         android:id="@+id/flFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_const"
+        android:layout_height="@dimen/match_const"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

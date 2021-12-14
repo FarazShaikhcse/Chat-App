@@ -12,6 +12,8 @@ import com.example.chatapp.databinding.FragmentImagePreviewBinding
 import com.example.chatapp.util.Constants
 import com.example.chatapp.viewmodel.ChatDetailViewModel
 import com.example.chatapp.viewmodel.ChatDetailViewModelFactory
+import com.example.chatapp.viewmodel.ImageViewModel
+import com.example.chatapp.viewmodel.ImageViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 
@@ -19,6 +21,7 @@ import com.example.chatapp.wrapper.GroupChat
 class ImagePreviewFragment : Fragment() {
 
     private lateinit var binding: FragmentImagePreviewBinding
+    private lateinit var imageViewModel: ImageViewModel
     private lateinit var chatDetailViewModel: ChatDetailViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,19 +35,23 @@ class ImagePreviewFragment : Fragment() {
                 .load(Uri.parse(it))
                 .into(binding.preview)
         }
+        imageViewModel = ViewModelProvider(
+            requireActivity(),
+            ImageViewModelFactory()
+        )[ImageViewModel::class.java]
         chatDetailViewModel = ViewModelProvider(
             requireActivity(),
             ChatDetailViewModelFactory()
         )[ChatDetailViewModel::class.java]
         binding.imageSentPB.visibility = View.GONE
         binding.sendImageFAB.setOnClickListener {
-            chatDetailViewModel.uploadImageToStorage(Uri.parse(uri))
+            imageViewModel.uploadImageToStorage(Uri.parse(uri))
             binding.imageSentPB.visibility = View.VISIBLE
         }
         binding.closePreview.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
-        chatDetailViewModel.imageUploadedStatus.observe(viewLifecycleOwner) {
+        imageViewModel.imageUploadedStatus.observe(viewLifecycleOwner) {
             if (arguments?.getString(Constants.CHAT_TYPE) == Constants.CHATS) {
                 val selectedChat: ChatUser = arguments?.getSerializable("chat") as ChatUser
                 chatDetailViewModel.sendMsgToUser(
