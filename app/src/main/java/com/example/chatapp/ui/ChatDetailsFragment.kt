@@ -26,7 +26,6 @@ import com.example.chatapp.viewmodel.SharedViewModelFactory
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat
 import com.example.chatapp.wrapper.Message
-import androidx.fragment.app.FragmentActivity
 
 
 class ChatDetailsFragment : Fragment() {
