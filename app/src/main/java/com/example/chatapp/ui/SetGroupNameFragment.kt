@@ -31,8 +31,8 @@ class SetGroupNameFragment : Fragment() {
         grpName = view.findViewById(R.id.grpNameET)
         saveGrpfab = view.findViewById(R.id.saveGrpFAB)
         saveGrpfab.setOnClickListener {
-            if(grpName.text.isNotEmpty() && selectedIdList != null){
-                grpNameVM.createGrp(grpName.text.toString(),selectedIdList)
+            if (grpName.text.isNotEmpty() && selectedIdList != null) {
+                grpNameVM.createGrp(grpName.text.toString(), selectedIdList)
             }
         }
         observe()
@@ -40,11 +40,11 @@ class SetGroupNameFragment : Fragment() {
     }
 
     private fun observe() {
-        grpNameVM.grpCreatedStatus.observe(viewLifecycleOwner){
-            if(it){
+        grpNameVM.grpCreatedStatus.observe(viewLifecycleOwner) {
+            if (it) {
                 activity?.run {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.flFragment,HomeFragment())
+                        .replace(R.id.flFragment, HomeFragment())
                         .commit()
                 }
             }

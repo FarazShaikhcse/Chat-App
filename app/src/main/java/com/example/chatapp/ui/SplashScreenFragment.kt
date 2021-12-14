@@ -36,7 +36,14 @@ class SplashScreenFragment : Fragment() {
         logo.alpha = 0f
         logo.animate().setDuration(1500).alpha(1f).withEndAction {
             if (FirebaseAuth.getInstance().currentUser != null) {
-                AuthenticationService.getUserID()?.let { SharedPref.addString(Constants.USERID, it) }
+                AuthenticationService.getUserID()?.let {
+                    SharedPref.addString(Constants.USERID, it)
+                }
+                AuthenticationService.getPhoneNumber()?.let {
+                    SharedPref.addString(Constants.PHONE,
+                        it
+                    )
+                }
                 FirebaseMessagingSv().getToken {
                     sharedViewModel.updateToken(it)
                 }

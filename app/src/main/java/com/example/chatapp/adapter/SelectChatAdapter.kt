@@ -49,7 +49,7 @@ class SelectChatAdapter(
     override fun onBindViewHolder(holder: SelectChatUserViewHolder, position: Int) {
         val userName = holder.itemView.findViewById<TextView>(R.id.chatUsernameTV)
         val profileImage = holder.itemView.findViewById<CircleImageView>(R.id.chatProfilePFP)
-        val about = holder.itemView.findViewById<TextView>(R.id.aboutTV)
+        val about = holder.itemView.findViewById<TextView>(R.id.recentMsgTV)
 
 
         holder.itemView.apply {

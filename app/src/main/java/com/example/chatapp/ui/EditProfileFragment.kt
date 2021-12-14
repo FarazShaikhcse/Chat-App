@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.chatapp.databinding.FragmentEditProfileBinding
 import com.example.chatapp.service.AuthenticationService
+import com.example.chatapp.util.Constants
 import com.example.chatapp.util.SharedPref
 import com.example.chatapp.viewmodel.SharedViewModel
 import com.example.chatapp.viewmodel.SharedViewModelFactory
@@ -29,6 +30,7 @@ class EditProfileFragment : Fragment() {
     private lateinit var binding: FragmentEditProfileBinding
     lateinit var getImage: ActivityResultLauncher<String>
     var uri: Uri? = null
+
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,15 +75,17 @@ class EditProfileFragment : Fragment() {
             userDetailsViewModel.addUserDetails(
                 User(
                     binding.username.editText?.text.toString(),
-                    binding.about.editText?.text.toString(), AuthenticationService.getUserID().toString())
+                    binding.about.editText?.text.toString(),
+                    AuthenticationService.getUserID().toString()
+                )
             )
         }
     }
 
     private fun observeData() {
 
-        userDetailsViewModel.userDetailAddedStatus.observe(viewLifecycleOwner){
-            if(it)
+        userDetailsViewModel.userDetailAddedStatus.observe(viewLifecycleOwner) {
+            if (it)
                 sharedViewModel.setGotoHomePageStatus(true)
             else
                 Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_LONG).show()

@@ -10,4 +10,23 @@
     <dimen name="usernametv_size">18sp</dimen>
     <dimen name="chat_separator_height">1dp</dimen>
     <dimen name="profile_pic_dim">50dp</dimen>
+    <dimen name="time_size">11sp</dimen>
+    <dimen name="message_size">16sp</dimen>
+    <dimen name="margin_10">10dp</dimen>
+    <dimen name="margin_2">2dp</dimen>
+    <dimen name="min_width">120dp</dimen>
+    <dimen name="max_width">250dp</dimen>
+    <dimen name="image_height">150dp</dimen>
+    <dimen name="profile_dim">40dp</dimen>
+    <dimen name="margin_24">24dp</dimen>
+    <dimen name="text_size">20sp</dimen>
+    <dimen name="recent_msg_height">30dp</dimen>
+    <dimen name="margin_12">12dp</dimen>
+    <dimen name="msg_et_height">48dp</dimen>
+    <dimen name="chat_pfp_size">32dp</dimen>
+    <dimen name="margin_20">20dp</dimen>
+    <dimen name="margin_32">32dp</dimen>
+    <dimen name="margin_45">45dp</dimen>
+    <dimen name="margin_27">27dp</dimen>
+    <item name="divider_width" type="dimen" format="float">1.5dp</item>
 </resources>

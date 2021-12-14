@@ -46,56 +46,60 @@ class MainActivity : AppCompatActivity() {
         }
         sharedViewModel.gotoHomePageStatus.observe(this@MainActivity, {
             if (it) {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.flFragment, HomeFragment())
-                    commit()
-                }
+                navigatePageWithoutBackStack(HomeFragment())
             }
         })
 
         sharedViewModel.gotoOTPPageStatus.observe(this@MainActivity, {
             if (it) {
-                navigatePage(OtpLoginPageFragment())
+                navigatePageWithBackStack(OtpLoginPageFragment())
             }
         })
 
         sharedViewModel.gotoWelcomePageStatus.observe(this@MainActivity,
             {
                 if (it) {
-                    navigatePage(WelcomePageFragment())
+                    navigatePageWithBackStack(WelcomePageFragment())
                 }
             })
 
         sharedViewModel.gotoUserDetailsPageStatus.observe(this@MainActivity,
             {
                 if (it) {
-                    navigatePage(UserDetailsFragment())
+                    navigatePageWithBackStack(UserDetailsFragment())
                 }
             })
 
         sharedViewModel.gotoEditProfilePageStatus.observe(this@MainActivity, {
             if (it) {
-                navigatePage(EditProfileFragment())
+                navigatePageWithBackStack(EditProfileFragment())
             }
         })
 
         sharedViewModel.gotoChatDetailsPageStatus.observe(this@MainActivity, {
             if (it) {
-                navigatePage(ChatDetailsFragment())
+                navigatePageWithBackStack(ChatDetailsFragment())
             }
         })
 
         sharedViewModel.gotoSplashPageStatus.observe(this@MainActivity, {
             if (it) {
-                navigatePage(SplashScreenFragment())
+                navigatePageWithBackStack(SplashScreenFragment())
             }
         })
     }
 
-    fun navigatePage(fragment: Fragment) {
+    fun navigatePageWithBackStack(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment, fragment)
             addToBackStack(null)
+            commit()
+        }
+    }
+
+    fun navigatePageWithoutBackStack(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFragment, fragment)
             commit()
         }
     }

@@ -8,12 +8,12 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/group_users_pfp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="@dimen/profile_dim"
+        android:layout_height="@dimen/profile_dim"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:src="@drawable/profileimg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="W,1:1"
@@ -24,12 +24,12 @@
 
     <TextView
         android:id="@+id/group_userName"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/match_const"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="16dp"
-        android:textSize="20sp"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_24"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:textSize="@dimen/text_size"
         android:textColor="@color/white"
         android:gravity="start"
         android:maxLines="1"
@@ -40,22 +40,22 @@
 
     <View
         android:id="@+id/view3"
-        android:layout_width="0dp"
-        android:layout_height="1.5dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="18dp"
-        android:background="#18252D"
+        android:layout_width="@dimen/match_const"
+        android:layout_height="@dimen/divider_width"
+        android:layout_marginTop="@dimen/margin_xs"
+        android:layout_marginEnd="@dimen/margin_med"
+        android:background="@color/divider_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/group_userName"
         app:layout_constraintTop_toBottomOf="@id/group_users_pfp"
-        app:layout_goneMarginTop="8dp" />
+        app:layout_goneMarginTop="@dimen/margin_small" />
 
     <CheckBox
         android:id="@+id/select_user_cb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_med"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

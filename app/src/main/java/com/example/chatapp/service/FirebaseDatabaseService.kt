@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.coroutines.suspendCoroutine
 import kotlin.streams.asSequence
 
@@ -134,47 +133,6 @@ object FirebaseDatabaseService {
                         )
                     }
                 }
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    fun getUpdatedChatsFromDb(senderId: String, receiverId: String):
-            Flow<ArrayList<Message>?> {
-        return callbackFlow {
-            val chatId = getChatDocid(senderId, receiverId)
-            val db = FirebaseFirestore.getInstance()
-            val msgList = ArrayList<Message>()
-            val ref = db.collection(Constants.CHATS).document(chatId)
-                .collection(Constants.MESSAGES)
-                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        this.trySend(null).isFailure
-                        error.printStackTrace()
-                    } else {
-                        if (snapshot != null) {
-                            for (doc in snapshot.documentChanges) {
-                                if (doc.type == DocumentChange.Type.ADDED) {
-                                    val item = doc.document
-                                    val msg = Message(
-                                        item.get(Constants.SENDERID).toString(),
-                                        item.get(Constants.SENT_TIME) as Long,
-                                        item.get(Constants.TEXT).toString(),
-                                        item.get(Constants.MESSAGE_TYPE).toString(),
-                                        item.get(Constants.SENDER_NAME) as String
-                                    )
-                                    msgList.add(msg)
-                                }
-                            }
-                        }
-                        Log.d("messageList", msgList.size.toString())
-                        this.trySend(msgList).isSuccess
-                    }
-                }
-
-            awaitClose() {
-                ref.remove()
-            }
         }
     }
 
@@ -313,42 +271,6 @@ object FirebaseDatabaseService {
 
     }
 
-    @ExperimentalCoroutinesApi
-    fun getUpdatedGroupChatsFromDb(groupId: String):
-            Flow<ArrayList<Message>?> {
-        return callbackFlow {
-            val db = FirebaseFirestore.getInstance()
-            val ref = db.collection(Constants.GROUPS).document(groupId)
-                .collection(Constants.MESSAGES)
-                .orderBy(Constants.SENT_TIME, Query.Direction.DESCENDING)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        this.trySend(null).isFailure
-                        error.printStackTrace()
-                    } else {
-                        if (value != null) {
-                            val messageList = arrayListOf<Message>()
-                            for (item in value.documents) {
-                                val data = item.data as HashMap<*, *>
-                                val message = Message(
-                                    senderId = data[Constants.SENDERID].toString(),
-                                    sentTime = data[Constants.SENT_TIME] as Long,
-                                    text = data[Constants.TEXT].toString(),
-                                    messageType = data[Constants.MESSAGE_TYPE].toString(),
-                                    senderName = data[Constants.SENDER_NAME].toString()
-                                )
-                                messageList.add(message)
-                            }
-                            this.trySend(messageList).isSuccess
-                        }
-                    }
-                }
-            awaitClose() {
-                ref.remove()
-            }
-        }
-    }
-
     suspend fun sendTextToGroupDb(
         sender: String,
         groupId: String,
@@ -445,6 +367,7 @@ object FirebaseDatabaseService {
                     val peername = it.get(Constants.USERNAME) as String
                     val pfpUri = it.get(Constants.PFP_URI) as String
                     val msgToken = it.get(Constants.TOKEN) as String
+                    val phone = it.get(Constants.PHONE) as String
                     cont.resumeWith(
                         Result.success(
                             User(
@@ -616,7 +539,7 @@ object FirebaseDatabaseService {
         return suspendCoroutine { cont ->
             val sender = SharedPref.get(Constants.USERID).toString()
             val list = mutableListOf<Message>()
-            if (offset != 0L && sender != null && receiver != null) {
+            if (offset != 0L && receiver != null) {
                 Log.d("pagination", "offset $offset")
                 val documentKey = getChatDocid(receiver, sender)
                 FirebaseFirestore.getInstance().collection(Constants.CHATS)
@@ -667,7 +590,7 @@ object FirebaseDatabaseService {
     suspend fun loadNextChatsGroups(groupId: String, offset: Long): MutableList<Message> {
         return suspendCoroutine { cont ->
             val list = mutableListOf<Message>()
-            if (offset != 0L && groupId != null) {
+            if (offset != 0L) {
                 Log.d("pagination", "offset $offset")
                 FirebaseFirestore.getInstance().collection(Constants.GROUPS)
                     .document(groupId)

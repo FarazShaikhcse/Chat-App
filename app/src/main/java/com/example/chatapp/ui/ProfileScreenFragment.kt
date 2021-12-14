@@ -2,15 +2,12 @@ package com.example.chatapp.ui
 
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.chatapp.R
-import com.example.chatapp.databinding.FragmentImagePreviewBinding
 import com.example.chatapp.databinding.FragmentProfileScreenBinding
-import com.example.chatapp.databinding.FragmentSingleChatBinding
 import com.example.chatapp.util.Constants
 import com.example.chatapp.wrapper.ChatUser
 import com.example.chatapp.wrapper.GroupChat

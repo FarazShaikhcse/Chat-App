@@ -48,7 +48,7 @@ class ChatAdapter(
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
         val username = holder.itemView.findViewById<TextView>(R.id.chatUsernameTV)
-        val message = holder.itemView.findViewById<TextView>(R.id.aboutTV)
+        val message = holder.itemView.findViewById<TextView>(R.id.recentMsgTV)
         val pfp = holder.itemView.findViewById<CircleImageView>(R.id.chatProfilePFP)
 
         holder.itemView.apply {

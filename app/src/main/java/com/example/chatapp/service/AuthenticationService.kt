@@ -6,4 +6,7 @@ object AuthenticationService {
     fun getUserID(): String?{
         return FirebaseAuth.getInstance().currentUser?.uid
     }
+    fun getPhoneNumber(): String? {
+        return FirebaseAuth.getInstance().currentUser?.phoneNumber
+    }
 }

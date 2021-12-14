@@ -12,12 +12,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
+        android:layout_margin="@dimen/margin_2"
         android:id="@+id/rec_msg_layout"
         android:background="@drawable/rec_msg_bg"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="10dp"
+        android:paddingStart="@dimen/margin_10"
+        android:paddingEnd="@dimen/margin_10"
+        android:paddingTop="@dimen/margin_xs"
+        android:paddingBottom="@dimen/margin_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,12 +27,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/message_text"
-            android:layout_marginTop="4dp"
-            android:maxWidth="250dp"
-            android:minWidth="120dp"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:maxWidth="@dimen/max_width"
+            android:minWidth="@dimen/min_width"
             android:text="@string/username"
             android:textColor="@color/sent_msg_color"
-            android:textSize="16sp"
+            android:textSize="@dimen/message_size"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,11 +41,11 @@
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="250dp"
-            android:minWidth="120dp"
+            android:maxWidth="@dimen/max_width"
+            android:minWidth="@dimen/min_width"
             android:text="@string/hi"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="@dimen/message_size"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textSenderNameTV" />
 
@@ -53,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/msg_time_color"
-            android:textSize="11sp"
+            android:textSize="@dimen/time_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/message_text"
             android:text="@string/demo_time" />
@@ -62,15 +63,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rec_img_layout"
-        android:layout_width="0dp"
-        android:layout_margin="2dp"
+        android:layout_width="@dimen/match_const"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_2"
         android:background="@drawable/rec_msg_bg"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="10dp"
+        android:paddingStart="@dimen/margin_10"
+        android:paddingEnd="@dimen/margin_10"
+        android:paddingBottom="@dimen/margin_10"
 
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/guidelineV1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -79,12 +80,12 @@
             android:id="@+id/imagesenderNameTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:maxWidth="250dp"
-            android:minWidth="120dp"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:maxWidth="@dimen/max_width"
+            android:minWidth="@dimen/min_width"
             android:text="@string/username"
             android:textColor="@color/sent_msg_color"
-            android:textSize="16sp"
+            android:textSize="@dimen/message_size"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -92,8 +93,8 @@
         <ImageView
             android:id="@+id/image_message"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="4dp"
+            android:layout_height="@dimen/image_height"
+            android:layout_marginTop="@dimen/margin_xs"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imagesenderNameTV" />
@@ -103,10 +104,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/msg_time_color"
-            android:textSize="11sp"
+            android:textSize="@dimen/time_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_message"
-            tools:text="11:34" />
+            tools:text="@string/demo_time" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.Guideline
